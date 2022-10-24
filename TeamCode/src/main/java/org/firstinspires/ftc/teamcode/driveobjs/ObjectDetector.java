@@ -1,6 +1,4 @@
-package org.firstinspires.ftc.teamcode.createdcode.driveobjs;
-
-import static org.firstinspires.ftc.teamcode.createdcode.configs.AutoConfig.*;
+package org.firstinspires.ftc.teamcode.driveobjs;
 
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -48,7 +46,6 @@ public class ObjectDetector
         this.pos3 = pos3;
         this.approxHeight = approxHeight;
         startCamera();
-
 
     }
 
@@ -122,8 +119,8 @@ public class ObjectDetector
             Imgproc.cvtColor(blurredImage, hsvImage, Imgproc.COLOR_BGR2HSV);
 
 
-            Scalar minValues = new Scalar(MIN_H, MIN_S, MIN_V);
-            Scalar maxValues = new Scalar(MAX_H, MAX_S, MAX_V);
+            Scalar minValues = new Scalar(1, 1, 1); //temp placeholders
+            Scalar maxValues = new Scalar(1, 1, 1); //temp placeholders
             Core.inRange(hsvImage, minValues, maxValues, mask);
 
             //erodes the little things
