@@ -19,7 +19,7 @@ import java.util.List;
 public class AutoBase extends EnhancedAutoMode {
     FtcDashboard dashboard = FtcDashboard.getInstance();
     Telemetry dashboardTelemetry = dashboard.getTelemetry();
-    ActionObject startingPos = new ActionObject(1, 1, 1);
+    public static ActionObject startingPos = new ActionObject(1, 1, 1);
 
     @Override
     public void runOpMode(){
@@ -29,7 +29,7 @@ public class AutoBase extends EnhancedAutoMode {
         //actionObjects.add(new ActionObject(1, 1, 1, 1/*x, y, angle, methodID*/));
         //actionObjects.add(new ActionObject(1, 1, 1, 1/*x, y, angle, methodID*/));
         //actionObjects.add(new ActionObject(1, 1, 1, 1/*x, y, angle, methodID*/));
-
+        readAprilTag();
 
 
         waitForStart();

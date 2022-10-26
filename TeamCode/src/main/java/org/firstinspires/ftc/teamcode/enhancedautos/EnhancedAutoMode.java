@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.enhancedautos;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -16,24 +17,25 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
     private FtcDashboard dashboard = FtcDashboard.getInstance();
     private Telemetry dashboardTelemetry = dashboard.getTelemetry();
     public List<ActionObject> actionObjects =  new ArrayList<>(0);
-
+    public Pose2d parkLocation;
 
     public void run(){
         enhancedDriver.run(actionObjects);
-    }
 
+        Pose2d currentPosition = enhancedDriver.getPoseEstimate();
+
+    }
 
 
     public void initThings(){
         enhancedDriver = new EnhancedDriver(hardwareMap);
     }
 
+    public void readAprilTag(){
+        //TODO: @Varun needs to implement this
 
-    public int getShippingElementPos(int h, int pos1, int pos2, int pos3){
-        ObjectDetector detector = new ObjectDetector(hardwareMap, h, pos1, pos2, pos3);
-        int pos = detector.getPos();
-        detector.endStream();
-        return pos;
+        //store it in the form of a Pose2D to parkLocation if you would
+        parkLocation = null;
     }
 
 }

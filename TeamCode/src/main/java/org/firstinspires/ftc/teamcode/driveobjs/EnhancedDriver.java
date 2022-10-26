@@ -1,17 +1,28 @@
 package org.firstinspires.ftc.teamcode.driveobjs;
 
 
+import static org.firstinspires.ftc.teamcode.configs.HardwareNames.*;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
+
+
 
 import java.util.List;
 
 public class EnhancedDriver extends SampleMecanumDrive{
+    private DcMotor frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
+    private DcMotor spoolMotor;
+    private CRServo grabServo;
+
+
 
     private HardwareMap hardwareMap;
     private boolean isFirstAction = true;
@@ -99,7 +110,41 @@ public class EnhancedDriver extends SampleMecanumDrive{
     //initializes the parts
     public void init(){
         //put parts here
-    }
+        /*
+        frontLeftMotor = hardwareMap.get(DcMotor.class, frontLeftMotorName);
+        frontRightMotor = hardwareMap.get(DcMotor.class, frontRightMotorName);
+        backLeftMotor = hardwareMap.get(DcMotor.class, backLeftMotorName);
+        backRightMotor = hardwareMap.get(DcMotor.class, backRightMotorName);
+        */
+
+
+
+        spoolMotor = hardwareMap.get(DcMotor.class, spoolMotorName);
+        spoolMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        spoolMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        spoolMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        grabServo = hardwareMap.get(CRServo.class, grabServoName);
+        grabServo.resetDeviceConfigurationForOpMode();
+
+        /*
+
+        grabServo = hardwareMap.get(Servo.class, "grabServo");
+        carouselMotor1 = hardwareMap.get(DcMotor.class, "spinnyBoyOne");
+        carouselMotor2 = hardwareMap.get(DcMotor.class, "spinnyBoyTwo");
+        armOne = hardwareMap.get(DcMotor.class, "armOne");
+        armTwo = hardwareMap.get(DcMotor.class, "armTwo");
+        armOne.setDirection(DcMotorSimple.Direction.REVERSE);
+        armOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        armTwo.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        armOne.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armTwo.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+         */
+           }
+
 
 
 }
