@@ -23,16 +23,19 @@ public class AutoBase extends EnhancedAutoMode {
 
     @Override
     public void runOpMode(){
+        int pos = 0;
         actionObjects = new ArrayList<ActionObject>(0);
         actionObjects.add(startingPos);
         actionObjects.add(new ActionObject(1, 1, 1, 1/*x, y, angle, methodID*/));
         //actionObjects.add(new ActionObject(1, 1, 1, 1/*x, y, angle, methodID*/));
         //actionObjects.add(new ActionObject(1, 1, 1, 1/*x, y, angle, methodID*/));
         //actionObjects.add(new ActionObject(1, 1, 1, 1/*x, y, angle, methodID*/));
-        readAprilTag();
 
+        while (!isStarted() && !isStopRequested()) {
+            pos = readAprilTag();
+        }
 
-        waitForStart();
+//        waitForStart();
         initThings();
         run();
     }
