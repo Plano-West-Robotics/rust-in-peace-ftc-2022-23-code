@@ -9,6 +9,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.driveobjs.ActionObject;
 import org.firstinspires.ftc.teamcode.driveobjs.EnhancedDriver;
+import org.firstinspires.ftc.teamcode.driveobjs.aprilTag.AprilTagDetector;
+
 import static org.firstinspires.ftc.teamcode.configs.ParkingLocations.*;
 
 import java.util.ArrayList;
@@ -119,10 +121,14 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
 
 
     public int readAprilTag(){
-        //TODO: @Varun needs to implement this
+        AprilTagDetector detector = new AprilTagDetector(hardwareMap);
+        int pos = detector.getPos();
+        detector.endStream();
 
-        //return the position 1, 2, or 3
-        return 0;
+        //store it in the form of a Pose2D to parkLocation if you would
+        pos = 0;
+
+        return pos;
     }
 
 }
