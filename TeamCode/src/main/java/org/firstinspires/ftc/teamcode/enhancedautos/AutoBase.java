@@ -1,9 +1,8 @@
 package org.firstinspires.ftc.teamcode.enhancedautos;
 
-import android.drm.DrmStore;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
@@ -11,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.driveobjs.ActionObject;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 @Disabled
 @Autonomous
@@ -19,22 +18,26 @@ import java.util.List;
 public class AutoBase extends EnhancedAutoMode {
     FtcDashboard dashboard = FtcDashboard.getInstance();
     Telemetry dashboardTelemetry = dashboard.getTelemetry();
-    public static ActionObject startingPos = new ActionObject(1, 1, 1);
+    public static Pose2d startingPos = new Pose2d();
+    public static ActionObject[] actionObjectList = {
+            new ActionObject(1, 1, 1, 1),
+            new ActionObject(1, 1, 1, 1)
+    };
+    public static StartTile startTile = null; //startingTile.[tile]
 
     @Override
     public void runOpMode(){
-        actionObjects = new ArrayList<ActionObject>(0);
-        actionObjects.add(startingPos);
-        actionObjects.add(new ActionObject(1, 1, 1, 1/*x, y, angle, methodID*/));
-        //actionObjects.add(new ActionObject(1, 1, 1, 1/*x, y, angle, methodID*/));
-        //actionObjects.add(new ActionObject(1, 1, 1, 1/*x, y, angle, methodID*/));
-        //actionObjects.add(new ActionObject(1, 1, 1, 1/*x, y, angle, methodID*/));
-        readAprilTag();
+        actionObjects = new ArrayList<ActionObject>(Arrays.asList(actionObjectList));
+
+        int parkPosition = readAprilTag();
+
+        initThings(startingPos);
 
 
         waitForStart();
-        initThings();
-        run();
+
+
+        run(startTile, parkPosition);
     }
 
 }
