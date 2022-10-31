@@ -24,17 +24,20 @@ public class AutoBase extends EnhancedAutoMode {
             new ActionObject(1, 1, 1, 1)
     };
     public static StartTile startTile = null; //startingTile.[tile]
+    private int parkPosition;
 
     @Override
     public void runOpMode(){
         actionObjects = new ArrayList<ActionObject>(Arrays.asList(actionObjectList));
 
-        int parkPosition = readAprilTag();
+        int parkPosition;
 
         initThings(startingPos);
 
 
-        waitForStart();
+        while (!isStarted() && !isStopRequested()) {
+            parkPosition = readAprilTag();
+        }
 
 
         run(startTile, parkPosition);
