@@ -36,6 +36,10 @@ public class EnhancedDriver extends SampleMecanumDrive{
         init();
     }
 
+    public void initPosition(Pose2d startingPos){
+        setPoseEstimate(startingPos);
+    }
+
     public void run(List<ActionObject> actionObjects){
         setPoseEstimate(actionObjects.remove(0).getPose2d());
         for(ActionObject actionObject : actionObjects) {

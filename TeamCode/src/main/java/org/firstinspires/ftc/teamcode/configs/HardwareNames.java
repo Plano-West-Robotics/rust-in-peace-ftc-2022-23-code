@@ -11,8 +11,4 @@ public class HardwareNames {
 
     public static String spoolMotorName = "";
     public static String grabServoName = "";
-
-
-
-
 }
