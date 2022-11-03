@@ -8,6 +8,12 @@ public class ActionObject {
     private int methodID;
 
     //angle is ending angle iirc
+    public ActionObject(Pose2d pose){
+        this.x = pose.getX();
+        this.y = pose.getY();
+        this.angle = pose.getHeading();
+    }
+
     public ActionObject(double x, double y, double angle){
         this.x = x;
         this.y = y;

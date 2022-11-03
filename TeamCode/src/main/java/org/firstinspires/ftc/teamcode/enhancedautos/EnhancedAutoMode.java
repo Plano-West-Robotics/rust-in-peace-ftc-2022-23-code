@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.driveobjs.ActionObject;
 import org.firstinspires.ftc.teamcode.driveobjs.EnhancedDriver;
 import org.firstinspires.ftc.teamcode.driveobjs.aprilTag.AprilTagDetector;
 
+import static org.firstinspires.ftc.teamcode.configs.JunctionPoints.generateJunctionPoints;
 import static org.firstinspires.ftc.teamcode.configs.ParkingLocations.*;
 
 import java.util.ArrayList;
@@ -29,13 +30,11 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
 
     public void run(){
 
-
         enhancedDriver.run(actionObjects);
 
         Pose2d currentPosition = enhancedDriver.getPoseEstimate();
         double currentX = currentPosition.getX();
         double currentY = currentPosition.getY();
-
     }
 
 
@@ -47,76 +46,140 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
     }
 
     public List<ActionObject> calculateParking(StartTile startTile, ActionObject lastPosition, int parkPosition){
-        //TODO
+        //TODO: Everything
+
+        ArrayList<ActionObject> newLocations = new ArrayList<>(0);
+
         Pose2d lastPose = lastPosition.getPose2d();
         double lastX = lastPose.getX();
         double lastY = lastPose.getY();
-        double angle = lastPose.getHeading();
+        double lastHeading = lastPose.getHeading();
+
+        //gets the actual Pose2d representing the ideal parking location
+        Pose2d parkingGoal = calculateTargetPositions(startTile, parkPosition);
+
+        Pose2d[] collisionSquare = calculateCollisionSquarePoints(lastHeading, lastPose);
+
+        List<Pose2d> collisionPoints = checkForCollison(collisionSquare, lastPose);
+
+        if (!collisionPoints.isEmpty()){
+            dashboardTelemetry.addLine("Collision Detected");
+            dashboardTelemetry.update();
+            //TODO: Get out of the collision and realign
+        }
+
+        /**
+         * calculates the nearest center of tile
+         */
+        //the x value change in the negative direction
+        double closeNegX = -1*((lastPose.getX()+9) % 18);
+        //the x value change in the positive direction
+        double closePosX = 18 - ((lastPose.getX()+9) % 18);
+
+        //the y value change in the negative direction
+        double closeNegY = -1*((lastPose.getY()+9) % 18);
+        //the y value change in the positive direction
+        double closePosY = 18 - ((lastPose.getY()+9) % 18);
+
+
+        Pose2d nearestCenter = new Pose2d(
+                //checks for the smaller of the two distances and adds that to the last position
+                lastX + (Math.abs(closeNegX) < closePosX ? closeNegX : closePosX),
+                lastX + (Math.abs(closeNegY) < closePosY ? closeNegY : closePosY),
+                lastHeading
+                );
+
+        newLocations.add(new ActionObject(nearestCenter));
+
+        /**
+         * first checks to see if it is already in position
+         * if so, just adjusts the heading accordingly and returns the locations
+         */
+
+        if (Math.abs(nearestCenter.getX() - parkingGoal.getX()) < 1 && Math.abs(nearestCenter.getY() - parkingGoal.getY()) < 1) {
+            newLocations.add(new ActionObject(parkingGoal));
+            return newLocations;
+        }
+
+
+        /**
+         * moves onto the "rail line" first after turning to the correct orientation
+         */
 
 
 
-        //creates the line that represents valid parking spots
-        Pose2d goalLinePoint1 = null;
-        Pose2d goalLinePoint2 = null;
+        return null;
+    }
+
+    private ArrayList<Pose2d> checkForCollison(Pose2d[] square, Pose2d lastPose) {
+        ArrayList<Pose2d> junctions = generateJunctionPoints();
+        ArrayList<Pose2d> collidingJunctions = new ArrayList<Pose2d>(0);
+        for(Pose2d junction : junctions){
+            /**
+             * This code generates a list of vectors between each junction and the corners
+             */
+            List<Vector2d> vector2dList = new ArrayList<Vector2d>(0);
+            for(Pose2d corner : square) {
+                vector2dList.add(new Vector2d(corner.getX()-junction.getX(), corner.getY()- junction.getY()));
+            }
+            /**
+             * This code summs the angle between the vectors
+             */
+            double totalAngle = 0;
+            for(int i = 0; i < 4; i++){
+                totalAngle+=vector2dList.get(i).angleBetween(vector2dList.get((i+1)%4));
+            }
+            /**
+             * this should be a good approximation of collision
+             */
+            if (totalAngle > 355){
+                collidingJunctions.add(junction);
+            }
+        }
+        return collidingJunctions;
+    }
+
+    private Pose2d[] calculateCollisionSquarePoints(double angle, Pose2d lastPose) {
+        angle+=45;
+        Pose2d[] square = new Pose2d[4];
+        for (int i = 0; i < 4; i++){
+            angle%=360;
+            square[i] = new Pose2d(
+                    9*Math.sqrt(2)*Math.cos(angle)+lastPose.getX(),
+                    9*Math.sqrt(2)*Math.sin(angle)+lastPose.getY());
+            angle+=90;
+        }
+        return square;
+    }
+
+    private Pose2d calculateTargetPositions(StartTile startTile, int parkPosition) {
+        Pose2d parkingGoal = null;
         switch(startTile) {
             case A2:
-                goalLinePoint1 = A2Point1;
-                goalLinePoint2 = A2Point2;
+                parkingGoal = A2Point1;
                 break;
             case A5:
-                goalLinePoint1 = A5Point1;
-                goalLinePoint2 = A5Point2;
+                parkingGoal = A5Point1;
                 break;
             case F2:
-                goalLinePoint1 = F2Point1;
-                goalLinePoint2 = F2Point2;
+                parkingGoal = F2Point1;
                 break;
             case F5:
-                goalLinePoint1 = F5Point1;
-                goalLinePoint2 = F5Point2;
+                parkingGoal = F5Point1;
                 break;
         }
 
         //offsets those lines based on the parking position
         switch(parkPosition){
             case(3):
-                goalLinePoint1 = new Pose2d(goalLinePoint1.getX()+18, goalLinePoint1.getY()+18);
-                goalLinePoint2 = new Pose2d(goalLinePoint2.getX()+18, goalLinePoint2.getY()+18);
+                parkingGoal = new Pose2d(parkingGoal.getX()+18, parkingGoal.getY()+18);
             case(2):
-                goalLinePoint1 = new Pose2d(goalLinePoint1.getX()+18, goalLinePoint1.getY()+18);
-                goalLinePoint2 = new Pose2d(goalLinePoint2.getX()+18, goalLinePoint2.getY()+18);
+                parkingGoal = new Pose2d(parkingGoal.getX()+18, parkingGoal.getY()+18);
             case(1):
                 break;
         }
 
-        for (double i = 0; i < 26; i+=0.1){
-            double newX = angle*Math.cos(angle+180);
-            double newY = angle*Math.sin(angle+180);
-
-            double[] x = new double[]{newX, goalLinePoint1.getX(), goalLinePoint2.getX()};
-            double[] y = new double[]{newY, goalLinePoint1.getY(), goalLinePoint2.getY()};
-
-            
-
-        }
-
-
-
-        if(Math.abs(lastX % 6) < Math.abs(lastY % 6)){
-
-        }
-        if(Math.abs(lastY % 6) < Math.abs(lastX % 6)){
-
-        }
-
-
-
-
-
-
-
-
-        return null;
+        return parkingGoal;
     }
 
 
@@ -126,8 +189,6 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
         detector.endStream();
 
         //store it in the form of a Pose2D to parkLocation if you would
-        pos = 0;
-
         return pos;
     }
 
