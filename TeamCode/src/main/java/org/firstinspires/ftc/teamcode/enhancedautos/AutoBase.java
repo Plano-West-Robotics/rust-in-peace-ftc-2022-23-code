@@ -19,28 +19,29 @@ public class AutoBase extends EnhancedAutoMode {
     FtcDashboard dashboard = FtcDashboard.getInstance();
     Telemetry dashboardTelemetry = dashboard.getTelemetry();
     public static Pose2d startingPos = new Pose2d();
+
     public static ActionObject[] actionObjectList = {
             new ActionObject(1, 1, 1, 1),
             new ActionObject(1, 1, 1, 1)
     };
+
+
     public static StartTile startTile = null; //startingTile.[tile]
-    private int parkPosition;
+    private int parkPosition = 0;
 
     @Override
     public void runOpMode(){
-        actionObjects = new ArrayList<ActionObject>(Arrays.asList(actionObjectList));
 
-        int parkPosition;
-
-        initThings(startingPos);
+        initThings(startingPos, startTile, actionObjectList, parkPosition);
 
 
         while (!isStarted() && !isStopRequested()) {
             parkPosition = readAprilTag();
         }
 
+        initThings(startingPos, startTile, actionObjectList, parkPosition);
 
-        run(startTile, parkPosition);
+        run();
     }
 
 }
