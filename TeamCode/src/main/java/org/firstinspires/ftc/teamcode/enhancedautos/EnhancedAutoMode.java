@@ -42,13 +42,18 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
         enhancedDriver = new EnhancedDriver(hardwareMap);
         enhancedDriver.initPosition(startPos);
         this.actionObjects = new ArrayList<ActionObject>(Arrays.asList(actionObjects));
-        calculateParking(startTile, this.actionObjects.get(this.actionObjects.size()-1), parkPosition);
+        List<ActionObject> newLocations = calculateParking(startTile, this.actionObjects, parkPosition);
+        for (ActionObject newLocation : newLocations){
+            this.actionObjects.add(newLocation);
+        }
     }
 
-    public List<ActionObject> calculateParking(StartTile startTile, ActionObject lastPosition, int parkPosition){
+    public ArrayList<ActionObject> calculateParking(StartTile startTile, List<ActionObject> actionObjects, int parkPosition){
         //TODO: Everything
 
         ArrayList<ActionObject> newLocations = new ArrayList<>(0);
+        ActionObject lastPosition = actionObjects.get(actionObjects.size()-1);
+
 
         Pose2d lastPose = lastPosition.getPose2d();
         double lastX = lastPose.getX();
@@ -81,14 +86,13 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
         //the y value change in the positive direction
         double closePosY = 18 - ((lastPose.getY()+9) % 18);
 
-
         Pose2d nearestCenter = new Pose2d(
                 //checks for the smaller of the two distances and adds that to the last position
                 lastX + (Math.abs(closeNegX) < closePosX ? closeNegX : closePosX),
                 lastX + (Math.abs(closeNegY) < closePosY ? closeNegY : closePosY),
                 lastHeading
                 );
-
+        //adds the nearest center to the list, once to get there, another time to readjust heading
         newLocations.add(new ActionObject(nearestCenter));
 
         /**
@@ -96,7 +100,7 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
          * if so, just adjusts the heading accordingly and returns the locations
          */
 
-        if (Math.abs(nearestCenter.getX() - parkingGoal.getX()) < 1 && Math.abs(nearestCenter.getY() - parkingGoal.getY()) < 1) {
+        if (Math.abs(nearestCenter.getX() - parkingGoal.getX()) < 4 && Math.abs(nearestCenter.getY() - parkingGoal.getY()) < 4) {
             newLocations.add(new ActionObject(parkingGoal));
             return newLocations;
         }
@@ -105,10 +109,13 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
         /**
          * moves onto the "rail line" first after turning to the correct orientation
          */
+        Pose2d lastNewPose = newLocations.get(newLocations.size()-1).getPose2d();
+        newLocations.add(new ActionObject(new Pose2d(lastNewPose.getX(), lastNewPose.getY(), parkingGoal.getHeading())));
+        newLocations.add(new ActionObject(new Pose2d(lastNewPose.getX(), parkingGoal.getY(), parkingGoal.getHeading())));
+        newLocations.add(new ActionObject(parkingGoal));
 
 
-
-        return null;
+        return newLocations;
     }
 
     private ArrayList<Pose2d> checkForCollison(Pose2d[] square, Pose2d lastPose) {
