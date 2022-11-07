@@ -34,7 +34,6 @@ public class AutoBase extends EnhancedAutoMode {
 
         initThings(startingPos, startTile, actionObjectList, parkPosition);
 
-
         while (!isStarted() && !isStopRequested()) {
             parkPosition = readAprilTag();
         }

@@ -4,11 +4,11 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class HardwareNames {
-    public static String frontRightMotorName = "";
-    public static String frontLeftMotorName = "";
-    public static String backRightMotorName = "";
-    public static String backLeftMotorName = "";
+    public static String frontRightMotorName = "rightFront";
+    public static String frontLeftMotorName = "leftFront";
+    public static String backRightMotorName = "rightRear";
+    public static String backLeftMotorName = "leftRear";
 
-    public static String spoolMotorName = "";
-    public static String grabServoName = "";
+    public static String spoolMotorName = "liftMotor";
+    public static String grabServoName = "clawServo";
 }
