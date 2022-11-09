@@ -4,42 +4,44 @@ import static org.firstinspires.ftc.teamcode.configs.HardwareNames.backLeftMotor
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.backRightMotorName;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.frontLeftMotorName;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.frontRightMotorName;
+import static org.firstinspires.ftc.teamcode.configs.HardwareNames.spoolMotorName;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
-
 
 @TeleOp
 @Config
-public class DriveTeleOpv1 extends OpMode {
 
-    //Drive Variables
+public class DualControllerDriveTeleOp extends OpMode {
+
+    //drive stuff
     private DcMotor motorFR, motorFL, motorRR, motorRL;
     private double powerFR, powerFL, powerRR, powerRL;
-    private double drive = 0, strafe = 0, turn = 0;
-    private double speed = 1;
+    private double drive = 0, strafe = 0, turn = 0; //these values only exist to be overridden later
+    private double speed = 1; //this value only exist to be overridden later
+    private boolean lockSpeed = true;
+    public static  double constantSpeedMult = 0.5;
+    public static  double constantSpeedMultChangeMult = 0.25;
+    private boolean wasPressingDpadUp = false, wasPressingDpadDown = false;
 
-    //carousel servo things
-    private CRServo carouselServo;
-    private boolean turnCarouselRight = false, turnCarouselLeft = false;;
-    private double carouselPower = 0.5;
+    //spool stuff
+    private DcMotor spoolMotor, armTwo;
+    public static double spoolPower = 0.5;
+    public static  double armTwoPos = 0;
+    public static  double spoolSpeedMultiplier = 0.5;
 
-    //Arm Variables
-    private DcMotor armOne, armTwo;
-    private double armOnePow = 0.5, armTwoPow = 0.5;
-    private double armTwoPos = 0;
-    private double armSpeedMod = 0.5;
-    private Servo grabServo, holdServo;
-    private double grabServoPow, holdServoPow, servoSpeedMod = 0.05;
-    private boolean raiseArm;
+    //servo stuff
+    private CRServo grabServo;
+    private double servoSpeed = 1; //this value only exist to be overridden later
+    public static double servoSpeedMultiplier = 0.5;
+
+    //extra
     private boolean wasPressingA, wasPressingB, wasPressingX, wasPressingY;
-    
+
     @Override
     public void loop() {
         takeControllerInput();
@@ -47,33 +49,59 @@ public class DriveTeleOpv1 extends OpMode {
         drive();
         moveArm();
         armGrab();
-        checkCarousel();
+
+        telemetry.update();
     }
 
-
     private void takeControllerInput(){
+        /**
+         * reads all of the controller inputs
+         */
         drive = -1*gamepad1.left_stick_y;
         strafe = gamepad1.left_stick_x;
         turn = gamepad1.right_stick_x;
 
-        armOnePow = gamepad2.right_stick_x;
-        turnCarouselRight = gamepad2.b;
-        turnCarouselLeft = gamepad2.x;
-
-
-
-        if (gamepad2.a) {
+        /**
+         * deprecated code, exists here for posterity and in case of
+         * request for reimplementation
+         *
+        //if A is pressed, it will unlock more variable speed control, else will run at constantSpeedMult
+        if (gamepad1.a) {
             if (!wasPressingA) {
-                raiseArm = !raiseArm;
+                lockSpeed = !lockSpeed;
             }
             wasPressingA = true;
         }
         else wasPressingA = false;
+        */
 
-        armTwoPow = raiseArm ? 0.25 : gamepad2.right_stick_y * 0.25;
+        //every time the button is pressed, changes the speed multiplier by constantSpeedMultChangeMult
+        if (gamepad1.dpad_up) {
+            if (!wasPressingDpadUp) {
+                constantSpeedMult = Math.min(constantSpeedMult+constantSpeedMultChangeMult, 1);
+            }
+            wasPressingDpadUp = true;
+        }
+        else wasPressingDpadUp = false;
 
-        grabServoPow = gamepad2.left_stick_y;
-        holdServoPow = gamepad2.left_stick_x;
+        if (gamepad1.dpad_down) {
+            if (!wasPressingDpadDown) {
+                constantSpeedMult = Math.max(constantSpeedMult-constantSpeedMultChangeMult, 0);
+            }
+            wasPressingDpadDown = true;
+        }
+        else wasPressingDpadDown = false;
+
+
+        telemetry.addData("Constant Speed Mult", constantSpeedMult);
+
+        //sets the speed
+        speed = lockSpeed ? constantSpeedMult : gamepad1.right_trigger;
+
+        // sets them to gamepad2
+        // **WARNING POWER VARIABLE**
+        spoolPower = gamepad2.left_stick_y;
+        servoSpeed = gamepad2.right_stick_y;
 
     }
 
@@ -84,7 +112,7 @@ public class DriveTeleOpv1 extends OpMode {
         powerFL = drive + strafe;
         powerRR = drive + strafe;
         powerRL = drive - strafe;
-            
+
         addTurn(turn);
 
         // multiplies by speed
@@ -100,7 +128,7 @@ public class DriveTeleOpv1 extends OpMode {
         motorRL.setPower(powerRL);
 
         telemetry.addData("powerFR", powerFR);
-        telemetry.update();
+
     }
 
     private void addTurn(double turn){
@@ -112,24 +140,15 @@ public class DriveTeleOpv1 extends OpMode {
 
 
     private void moveArm(){
-        armOne.setPower(armOnePow * armSpeedMod);
-
-        armTwo.setPower(armTwoPow);
+        spoolMotor.setPower(spoolPower * spoolSpeedMultiplier);
+        telemetry.addData("spoolMotor Position", spoolMotor.getCurrentPosition());
     }
 
     private void armGrab(){
-        grabServo.setPosition(grabServo.getPosition() + -1*grabServoPow*servoSpeedMod);
-        holdServo.setPosition(holdServo.getPosition() + -1*holdServoPow*servoSpeedMod);
+        grabServo.setPower(servoSpeed * servoSpeedMultiplier);
+        //telemetry.addData("Servo Position", grabServo.get);
     }
 
-    private void checkCarousel() {
-        if (turnCarouselRight)
-            carouselServo.setPower(carouselPower);
-        else if (turnCarouselLeft)
-            carouselServo.setPower(-1*carouselPower);
-        else
-            carouselServo.setPower(0);
-    }
 
     @Override
     public void init() {
@@ -138,7 +157,7 @@ public class DriveTeleOpv1 extends OpMode {
         motorFL = hardwareMap.get(DcMotor.class, frontLeftMotorName);
         motorRR = hardwareMap.get(DcMotor.class, backRightMotorName);
         motorRL = hardwareMap.get(DcMotor.class, backLeftMotorName);
-        
+
         motorFL.setDirection(DcMotorSimple.Direction.REVERSE);
         motorRL.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -158,21 +177,13 @@ public class DriveTeleOpv1 extends OpMode {
         motorRL.setPower(0);
 
         //initializes the arm motors and servos
-        armOne = hardwareMap.get(DcMotor.class, "armOne");
-        armTwo = hardwareMap.get(DcMotor.class, "armTwo");
-        armOne.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        armTwo.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        armTwo.setDirection(DcMotorSimple.Direction.FORWARD);
-        armTwo.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        armTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        raiseArm = true;
+        spoolMotor = hardwareMap.get(DcMotor.class, spoolMotorName);
+        spoolMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        spoolMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        spoolMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        grabServo = hardwareMap.get(Servo.class, "grabServo");
-        holdServo = hardwareMap.get(Servo.class, "holdServo");
-        grabServo.setPosition(1);
-        holdServo.setPosition(0);
 
-        //initializes the carousel servo
-        carouselServo = hardwareMap.get(CRServo.class, "duckArm");
+        grabServo = hardwareMap.get(CRServo.class, "grabServo");
     }
 }

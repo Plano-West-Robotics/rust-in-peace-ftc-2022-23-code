@@ -139,7 +139,7 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
             /**
              * this should be a good approximation of collision
              */
-            if (totalAngle > 355){
+            if (totalAngle > Math.toRadians(355) && totalAngle < Math.toRadians(365)){
                 collidingJunctions.add(junction);
             }
         }
@@ -147,14 +147,14 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
     }
 
     private Pose2d[] calculateCollisionSquarePoints(double angle, Pose2d lastPose) {
-        angle+=45;
+        angle+=Math.toRadians(45);
         Pose2d[] square = new Pose2d[4];
         for (int i = 0; i < 4; i++){
-            angle%=360;
+            angle%=Math.toRadians(360);
             square[i] = new Pose2d(
                     9*Math.sqrt(2)*Math.cos(angle)+lastPose.getX(),
                     9*Math.sqrt(2)*Math.sin(angle)+lastPose.getY());
-            angle+=90;
+            angle+=Math.toRadians(90);
         }
         return square;
     }

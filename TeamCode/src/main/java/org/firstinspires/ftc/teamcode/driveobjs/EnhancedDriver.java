@@ -41,16 +41,27 @@ public class EnhancedDriver extends SampleMecanumDrive{
     }
 
     public void run(List<ActionObject> actionObjects){
-        setPoseEstimate(actionObjects.remove(0).getPose2d());
+        //setPoseEstimate(actionObjects.remove(0).getPose2d());
         for(ActionObject actionObject : actionObjects) {
             //checks for location change, and then moves to that location
             Pose2d newPose = actionObject.getPose2d();
             Pose2d lastPose = getPoseEstimate();
+
+            //ensures that there is no empty path exception
             if (!(newPose.getX() == lastPose.getX() && newPose.getY() == lastPose.getY())) {
                 Trajectory traj = trajectoryBuilder(lastPose)
                         .lineToLinearHeading(newPose)
                         .build();
                 followTrajectory(traj);
+            }
+            //if there is an empty path, checks to see if there is an angle change, if so, executes that angle change
+            else if (newPose.getHeading() != lastPose.getHeading()){
+                Trajectory traj = trajectoryBuilder(lastPose)
+                        .lineToLinearHeading(new Pose2d(lastPose.getX(), lastPose.getY()-0.01, newPose.getHeading()))
+                        .lineToLinearHeading(newPose)
+                        .build();
+                followTrajectory(traj);
+
             }
             executeAction(actionObject.getMethodID());
         }
@@ -89,8 +100,45 @@ public class EnhancedDriver extends SampleMecanumDrive{
     public void executeAction(int id) throws IndexOutOfBoundsException{
         int subIndex = id%10;
         switch(id/10){
+            case 0:
+                break;
+            case 1:
+                moveArm(subIndex);
+                break;
+            case 2:
+                turnGrabber(subIndex);
+                break;
+            default:
+                throw new IndexOutOfBoundsException("METHOD ID DOES NOT EXIST");
         }
 
+
+    }
+
+    private void turnGrabber(int subIndex) {
+        switch(subIndex){
+            case 0:
+                grabServo.setPower(0.5);
+                sleep(1000);
+                break;
+            case 1:
+                grabServo.setPower(-0.5);
+                sleep(1000);
+                break;
+        }
+    }
+
+    private void moveArm(int subIndex) {
+        switch(subIndex){
+            case 0:
+                spoolMotor.setPower(0.5);
+                sleep(1000);
+                break;
+            case 1:
+                spoolMotor.setPower(-0.5);
+                sleep(1000);
+                break;
+        }
     }
 
 
