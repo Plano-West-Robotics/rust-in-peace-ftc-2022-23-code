@@ -1,7 +1,9 @@
 1X:
     Arm Movements:
         10 Move to the lowest setting
-        11 Move to the highest setting
+        11 Move to the first lowest junction
+        12 Move to the next highest junction
+        13 Move to the highest setting
 
 2X:
     Grabber Movements:

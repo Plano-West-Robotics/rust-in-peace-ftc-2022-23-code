@@ -37,7 +37,15 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
         double currentY = currentPosition.getY();
     }
 
+    // basic initialization, does not calulate the rest of the parking path
+    public void initThings(Pose2d startPos, StartTile startTile, ActionObject[] actionObjects){
+        enhancedDriver = new EnhancedDriver(hardwareMap);
+        enhancedDriver.initPosition(startPos);
+        this.actionObjects = new ArrayList<ActionObject>(Arrays.asList(actionObjects));
+    }
 
+    // implements the calculate parking to automatic calculate the parking position from the final position
+    // TODO: DOES NOT UNCOLLIDE ITSELF FROM JUNCTION YET
     public void initThings(Pose2d startPos, StartTile startTile, ActionObject[] actionObjects, int parkPosition){
         enhancedDriver = new EnhancedDriver(hardwareMap);
         enhancedDriver.initPosition(startPos);
@@ -71,6 +79,12 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
             dashboardTelemetry.addLine("Collision Detected");
             dashboardTelemetry.update();
             //TODO: Get out of the collision and realign
+            // will probably just backtrack untul no more collision tbh
+            // we are going to ignore this problem for now and just make the path never end
+            // in collision with a junction
+
+
+
         }
 
         /**
@@ -130,7 +144,7 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
                 vector2dList.add(new Vector2d(corner.getX()-junction.getX(), corner.getY()- junction.getY()));
             }
             /**
-             * This code summs the angle between the vectors
+             * This code sums the angle between the vectors
              */
             double totalAngle = 0;
             for(int i = 0; i < 4; i++){

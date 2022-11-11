@@ -1,6 +1,10 @@
 package org.firstinspires.ftc.teamcode.driveobjs;
 
 
+import static org.firstinspires.ftc.teamcode.configs.AutoConfig.ArmPosition1EncoderCount;
+import static org.firstinspires.ftc.teamcode.configs.AutoConfig.ArmPosition2EncoderCount;
+import static org.firstinspires.ftc.teamcode.configs.AutoConfig.ArmPosition3EncoderCount;
+import static org.firstinspires.ftc.teamcode.configs.AutoConfig.ArmPosition4EncoderCount;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.*;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -11,6 +15,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.configs.AutoConfig;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 
 
@@ -63,6 +68,7 @@ public class EnhancedDriver extends SampleMecanumDrive{
                 followTrajectory(traj);
 
             }
+
             executeAction(actionObject.getMethodID());
         }
     }
@@ -131,14 +137,27 @@ public class EnhancedDriver extends SampleMecanumDrive{
     private void moveArm(int subIndex) {
         switch(subIndex){
             case 0:
+                spoolMotor.setTargetPosition(ArmPosition1EncoderCount);
+                spoolMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 spoolMotor.setPower(0.5);
-                sleep(1000);
                 break;
             case 1:
-                spoolMotor.setPower(-0.5);
-                sleep(1000);
+                spoolMotor.setTargetPosition(ArmPosition2EncoderCount);
+                spoolMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                spoolMotor.setPower(0.5);
+                break;
+            case 2:
+                spoolMotor.setTargetPosition(ArmPosition3EncoderCount);
+                spoolMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                spoolMotor.setPower(0.5);
+                break;
+            case 3:
+                spoolMotor.setTargetPosition(ArmPosition4EncoderCount);
+                spoolMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                spoolMotor.setPower(0.5);
                 break;
         }
+        while(spoolMotor.isBusy()){sleep(1);}
     }
 
 
