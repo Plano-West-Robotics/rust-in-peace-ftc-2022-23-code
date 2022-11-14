@@ -5,7 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 import java.util.ArrayList;
 
-@Config
+
 public class JunctionPoints {
     public static ArrayList<Pose2d> generateJunctionPoints(){
         ArrayList<Pose2d> junctions = new ArrayList<>();

@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.configs.HardwareNames.backLeftMotor
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.backRightMotorName;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.frontLeftMotorName;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.frontRightMotorName;
+import static org.firstinspires.ftc.teamcode.configs.HardwareNames.grabServoName;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.spoolMotorName;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -38,7 +39,7 @@ public class MonoControllerDriveTeleOp extends OpMode {
         LOWERING,
         PAUSED
     }
-    SpoolState spoolState = SpoolState.PAUSED;
+    private SpoolState spoolState = SpoolState.PAUSED;
 
     //servo stuff
     private CRServo grabServo;
@@ -107,6 +108,7 @@ public class MonoControllerDriveTeleOp extends OpMode {
         // messes with them to get them on gamepad 1
 
         // sets the spoolState
+        /**
         if (gamepad1.right_bumper){
             if (spoolState != SpoolState.PAUSED){
                 spoolState = SpoolState.PAUSED;
@@ -123,8 +125,9 @@ public class MonoControllerDriveTeleOp extends OpMode {
                 spoolState = SpoolState.LOWERING;
             }
         }
-
-        servoSpeed = gamepad2.right_stick_y;
+        */
+        spoolPower = (gamepad1.left_bumper ? 1 : 0) - (gamepad1.right_bumper ? 1 : 0);
+        servoSpeed = gamepad1.right_trigger - gamepad1.left_trigger;
 
     }
 
@@ -163,13 +166,26 @@ public class MonoControllerDriveTeleOp extends OpMode {
 
 
     private void moveArm(){
+        /**
+        switch(spoolState){
+            case LIFTING:
+                spoolMotor.setPower(-spoolPower);
+                break;
+            case LOWERING:
+                spoolMotor.setPower(spoolPower);
+                break;
+            case PAUSED:
+
+        }
+         */
         spoolMotor.setPower(spoolPower * spoolSpeedMultiplier);
         telemetry.addData("spoolMotor Position", spoolMotor.getCurrentPosition());
     }
 
     private void armGrab(){
+
         grabServo.setPower(servoSpeed * servoSpeedMultiplier);
-        //telemetry.addData("Servo Position", grabServo.get);
+        telemetry.addData("Servo Speed", servoSpeed);
     }
 
 
@@ -205,8 +221,9 @@ public class MonoControllerDriveTeleOp extends OpMode {
         spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spoolMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spoolMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        spoolMotor.setPower(0);
 
 
-        grabServo = hardwareMap.get(CRServo.class, "grabServo");
+        grabServo = hardwareMap.get(CRServo.class, grabServoName);
     }
 }

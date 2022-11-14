@@ -9,8 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.driveobjs.ActionObject;
 
-@Disabled
-@Autonomous
+@Autonomous (group = "Full Parking")
 @Config
 public class F2Autonomous extends EnhancedAutoMode {
     FtcDashboard dashboard = FtcDashboard.getInstance();
@@ -27,7 +26,7 @@ public class F2Autonomous extends EnhancedAutoMode {
     };
 
 
-    public static StartTile startTile = null; //startingTile.[tile]
+    private StartTile startTile = null; //startingTile.[tile]
     private int parkPosition = 0;
 
     @Override

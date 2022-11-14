@@ -15,6 +15,7 @@ import java.util.Arrays;
 @Disabled
 @Autonomous
 @Config
+
 public class AutoBase extends EnhancedAutoMode {
     FtcDashboard dashboard = FtcDashboard.getInstance();
     Telemetry dashboardTelemetry = dashboard.getTelemetry();
@@ -26,7 +27,7 @@ public class AutoBase extends EnhancedAutoMode {
     };
 
 
-    public static StartTile startTile = null; //startingTile.[tile]
+    private StartTile startTile = null; //startingTile.[tile]
     private int parkPosition = 0;
 
     @Override

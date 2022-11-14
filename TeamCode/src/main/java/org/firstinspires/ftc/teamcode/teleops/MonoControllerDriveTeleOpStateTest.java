@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.teamcode.configs.HardwareNames.grabServoName
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.spoolMotorName;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -16,8 +17,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp
 @Config
-
-public class DualControllerDriveTeleOp extends OpMode {
+@Disabled
+public class MonoControllerDriveTeleOpStateTest extends OpMode {
 
     //drive stuff
     private DcMotor motorFR, motorFL, motorRR, motorRL;
@@ -32,8 +33,14 @@ public class DualControllerDriveTeleOp extends OpMode {
     //spool stuff
     private DcMotor spoolMotor, armTwo;
     public static double spoolPower = 0.5;
-    public static  double armTwoPos = 0;
-    public static  double spoolSpeedMultiplier = 0.5;
+    public static double armTwoPos = 0;
+    public static double spoolSpeedMultiplier = 0.5;
+    private enum SpoolState{
+        LIFTING,
+        LOWERING,
+        PAUSED
+    }
+    private SpoolState spoolState = SpoolState.PAUSED;
 
     //servo stuff
     private CRServo grabServo;
@@ -66,15 +73,15 @@ public class DualControllerDriveTeleOp extends OpMode {
          * deprecated code, exists here for posterity and in case of
          * request for reimplementation
          *
-        //if A is pressed, it will unlock more variable speed control, else will run at constantSpeedMult
-        if (gamepad1.a) {
-            if (!wasPressingA) {
-                lockSpeed = !lockSpeed;
-            }
-            wasPressingA = true;
-        }
-        else wasPressingA = false;
-        */
+         //if A is pressed, it will unlock more variable speed control, else will run at constantSpeedMult
+         if (gamepad1.a) {
+         if (!wasPressingA) {
+         lockSpeed = !lockSpeed;
+         }
+         wasPressingA = true;
+         }
+         else wasPressingA = false;
+         */
 
         //every time the button is pressed, changes the speed multiplier by constantSpeedMultChangeMult
         if (gamepad1.dpad_up) {
@@ -99,10 +106,29 @@ public class DualControllerDriveTeleOp extends OpMode {
         //sets the speed
         speed = lockSpeed ? constantSpeedMult : gamepad1.right_trigger;
 
-        // sets them to gamepad2
-        // **WARNING POWER VARIABLE**
-        spoolPower = gamepad2.left_stick_y;
-        servoSpeed = gamepad2.right_stick_y;
+        // messes with them to get them on gamepad 1
+
+        // sets the spoolState
+
+        if (gamepad1.right_bumper){
+            if (spoolState != SpoolState.PAUSED){
+                spoolState = SpoolState.PAUSED;
+            }
+            else {
+                spoolState = SpoolState.LIFTING;
+            }
+        }
+        else if (gamepad1.left_bumper){
+            if (spoolState != SpoolState.PAUSED){
+                spoolState = SpoolState.PAUSED;
+            }
+            else {
+                spoolState = SpoolState.LOWERING;
+            }
+        }
+
+        //spoolPower = (gamepad1.left_bumper ? 1 : 0) - (gamepad1.right_bumper ? 1 : 0);
+        servoSpeed = gamepad1.right_trigger - gamepad1.left_trigger;
 
     }
 
@@ -141,13 +167,26 @@ public class DualControllerDriveTeleOp extends OpMode {
 
 
     private void moveArm(){
-        spoolMotor.setPower(spoolPower * spoolSpeedMultiplier);
+
+        switch(spoolState){
+            case LIFTING:
+                spoolMotor.setPower(-spoolPower);
+                break;
+            case LOWERING:
+                spoolMotor.setPower(spoolPower);
+                break;
+            case PAUSED:
+
+        }
+
+        //spoolMotor.setPower(spoolPower * spoolSpeedMultiplier);
         telemetry.addData("spoolMotor Position", spoolMotor.getCurrentPosition());
     }
 
     private void armGrab(){
+
         grabServo.setPower(servoSpeed * servoSpeedMultiplier);
-        //telemetry.addData("Servo Position", grabServo.get);
+        telemetry.addData("Servo Speed", servoSpeed);
     }
 
 
@@ -183,6 +222,7 @@ public class DualControllerDriveTeleOp extends OpMode {
         spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spoolMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spoolMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        spoolMotor.setPower(0);
 
 
         grabServo = hardwareMap.get(CRServo.class, grabServoName);
