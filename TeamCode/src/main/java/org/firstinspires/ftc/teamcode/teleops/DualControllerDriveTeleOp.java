@@ -8,11 +8,16 @@ import static org.firstinspires.ftc.teamcode.configs.HardwareNames.grabServoName
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.spoolMotorName;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import org.firstinspires.ftc.teamcode.configs.PoseStorage;
+import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 
 @TeleOp
 @Config
@@ -43,15 +48,49 @@ public class DualControllerDriveTeleOp extends OpMode {
     //extra
     private boolean wasPressingA, wasPressingB, wasPressingX, wasPressingY;
 
+    //roadrunner implementation
+    private SampleMecanumDrive roadrunnerDriver;
+    private Pose2d currentPose;
+
     @Override
     public void loop() {
         takeControllerInput();
 
-        drive();
+        //drive();
+        roadrunnerDrive();
         moveArm();
         armGrab();
 
         telemetry.update();
+    }
+
+    private void roadrunnerDrive() {
+
+        Vector2d input = new Vector2d(
+                drive,
+                -strafe
+        );
+        //input = input.rotated(-currentPose.getHeading());
+        /** Pass in the rotated input + right stick value for rotation
+         * Rotation is not part of the rotated input thus must be passed in separately
+         */
+        roadrunnerDriver.setWeightedDrivePower(
+                new Pose2d(
+                        input.getX(),
+                        input.getY(),
+                        -turn
+                )
+        );
+
+        roadrunnerDriver.update();
+
+        currentPose = roadrunnerDriver.getPoseEstimate();
+
+
+        telemetry.addData("x", currentPose.getX());
+        telemetry.addData("y", currentPose.getY());
+        telemetry.addData("heading", currentPose.getHeading());
+
     }
 
     private void takeControllerInput(){
@@ -106,7 +145,10 @@ public class DualControllerDriveTeleOp extends OpMode {
 
     }
 
-
+    /**
+     * DEPRECIATED CODE
+     * here for posterity only
+     */
     private void drive(){
 
         powerFR = drive - strafe;
@@ -132,6 +174,10 @@ public class DualControllerDriveTeleOp extends OpMode {
 
     }
 
+    /**
+     * DEPRECIATED CODE
+     * here for posterity only
+     */
     private void addTurn(double turn){
         powerFR -= turn;
         powerRR -= turn;
@@ -153,7 +199,9 @@ public class DualControllerDriveTeleOp extends OpMode {
 
     @Override
     public void init() {
-        //initializes the drive motors
+        /**
+         * initializes the drive motors
+         */
         motorFR = hardwareMap.get(DcMotor.class, frontRightMotorName) ;
         motorFL = hardwareMap.get(DcMotor.class, frontLeftMotorName);
         motorRR = hardwareMap.get(DcMotor.class, backRightMotorName);
@@ -177,14 +225,23 @@ public class DualControllerDriveTeleOp extends OpMode {
         motorRR.setPower(0);
         motorRL.setPower(0);
 
-        //initializes the arm motors and servos
+        /**
+         * initializes the arm motors and servos
+         */
         spoolMotor = hardwareMap.get(DcMotor.class, spoolMotorName);
         spoolMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spoolMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spoolMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
         grabServo = hardwareMap.get(CRServo.class, grabServoName);
+
+        /**
+         * initializes the roadrunner stuff
+         */
+        roadrunnerDriver = new SampleMecanumDrive(hardwareMap);
+        currentPose = PoseStorage.currentPose;
+        roadrunnerDriver.setPoseEstimate(currentPose);
+
     }
 }

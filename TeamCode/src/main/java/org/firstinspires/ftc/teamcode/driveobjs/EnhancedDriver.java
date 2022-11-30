@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.configs.AutoConfig;
+import org.firstinspires.ftc.teamcode.configs.PoseStorage;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 
 
@@ -68,7 +69,15 @@ public class EnhancedDriver extends SampleMecanumDrive{
                 followTrajectory(traj);
 
             }
+            /**
+             * adds the current pose to the pose storage class for transfer across OpModes
+             */
+            PoseStorage.currentPose = getPoseEstimate();
 
+            /**
+             * executes the action specified by the ID
+             * IMPORTANT: THIS EXECUTES AFTER THE MOVEMENT
+             */
             executeAction(actionObject.getMethodID());
         }
     }
