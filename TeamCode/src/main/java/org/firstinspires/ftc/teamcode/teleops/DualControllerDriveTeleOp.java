@@ -4,7 +4,7 @@ import static org.firstinspires.ftc.teamcode.configs.HardwareNames.backLeftMotor
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.backRightMotorName;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.frontLeftMotorName;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.frontRightMotorName;
-import static org.firstinspires.ftc.teamcode.configs.HardwareNames.grabServoName;
+import static org.firstinspires.ftc.teamcode.configs.HardwareNames.grabServo1Name;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.spoolMotorName;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -52,6 +52,8 @@ public class DualControllerDriveTeleOp extends OpMode {
     private SampleMecanumDrive roadrunnerDriver;
     private Pose2d currentPose;
 
+
+
     @Override
     public void loop() {
         takeControllerInput();
@@ -59,6 +61,7 @@ public class DualControllerDriveTeleOp extends OpMode {
         //drive();
         roadrunnerDrive();
         moveArm();
+
         armGrab();
 
         telemetry.update();
@@ -146,7 +149,7 @@ public class DualControllerDriveTeleOp extends OpMode {
     }
 
     /**
-     * DEPRECIATED CODE
+     * @deprecated use roadRunnerDrive
      * here for posterity only
      */
     private void drive(){
@@ -175,7 +178,7 @@ public class DualControllerDriveTeleOp extends OpMode {
     }
 
     /**
-     * DEPRECIATED CODE
+     * @deprecated use roadRunnerDrive
      * here for posterity only
      */
     private void addTurn(double turn){
@@ -187,9 +190,25 @@ public class DualControllerDriveTeleOp extends OpMode {
 
 
     private void moveArm(){
+
         spoolMotor.setPower(spoolPower * spoolSpeedMultiplier);
         telemetry.addData("spoolMotor Position", spoolMotor.getCurrentPosition());
     }
+
+
+    /**
+     * moves the linear slide with a pid controller that is hopefully correctly implemented
+     */
+    private LinearSlideDriver slideDriver;
+    private void moveArmWithPID(int target){
+        slideDriver.setTarget(target);
+        int[] slidePIDOutput = slideDriver.run();
+        telemetry.addData("Slide Target", slidePIDOutput[0]);
+        telemetry.addData("Slide Current", slidePIDOutput[1]);
+        telemetry.addData("Slide Error", slidePIDOutput[2]);
+    }
+
+
 
     private void armGrab(){
         grabServo.setPower(servoSpeed * servoSpeedMultiplier);
@@ -227,6 +246,8 @@ public class DualControllerDriveTeleOp extends OpMode {
 
         /**
          * initializes the arm motors and servos
+         * @deprecated use runMotorWithPID() instead
+         * exists to keep functionality of older code
          */
         spoolMotor = hardwareMap.get(DcMotor.class, spoolMotorName);
         spoolMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -234,7 +255,13 @@ public class DualControllerDriveTeleOp extends OpMode {
         spoolMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spoolMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        grabServo = hardwareMap.get(CRServo.class, grabServoName);
+        /**
+         * initalizes the spoolMotor's pid controller stuff
+         */
+        slideDriver = new LinearSlideDriver(hardwareMap);
+
+        //TODO: TEMPORARY FIX TO NOT THROW ERROR
+        grabServo = hardwareMap.get(CRServo.class, grabServo1Name);
 
         /**
          * initializes the roadrunner stuff

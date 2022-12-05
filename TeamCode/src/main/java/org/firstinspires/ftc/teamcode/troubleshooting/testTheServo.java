@@ -1,12 +1,10 @@
 package org.firstinspires.ftc.teamcode.troubleshooting;
 
-import static org.firstinspires.ftc.teamcode.configs.HardwareNames.grabServoName;
-import static org.firstinspires.ftc.teamcode.configs.HardwareNames.spoolMotorName;
+import static org.firstinspires.ftc.teamcode.configs.HardwareNames.grabServo1Name;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 @TeleOp
 public class testTheServo extends OpMode {
@@ -19,7 +17,7 @@ public class testTheServo extends OpMode {
 
     @Override
     public void init(){
-        testServo = hardwareMap.get(CRServo.class, grabServoName);
+        testServo = hardwareMap.get(CRServo.class, grabServo1Name);
 
     }
 

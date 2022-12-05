@@ -4,7 +4,7 @@ import static org.firstinspires.ftc.teamcode.configs.HardwareNames.backLeftMotor
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.backRightMotorName;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.frontLeftMotorName;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.frontRightMotorName;
-import static org.firstinspires.ftc.teamcode.configs.HardwareNames.grabServoName;
+import static org.firstinspires.ftc.teamcode.configs.HardwareNames.grabServo1Name;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.spoolMotorName;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -225,6 +225,6 @@ public class MonoControllerDriveTeleOpStateTest extends OpMode {
         spoolMotor.setPower(0);
 
 
-        grabServo = hardwareMap.get(CRServo.class, grabServoName);
+        grabServo = hardwareMap.get(CRServo.class, grabServo1Name);
     }
 }

@@ -10,6 +10,7 @@ public class HardwareNames {
     public static String backLeftMotorName = "leftRear";
 
     public static String spoolMotorName = "liftMotor";
-    public static String grabServoName = "clawServo";
+    public static String grabServo1Name = "clawServo1";
+    public static String grabServo2Name = "clawServo2";
 
 }

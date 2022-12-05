@@ -15,7 +15,6 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.configs.AutoConfig;
 import org.firstinspires.ftc.teamcode.configs.PoseStorage;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 
@@ -204,7 +203,7 @@ public class EnhancedDriver extends SampleMecanumDrive{
         spoolMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         spoolMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        grabServo = hardwareMap.get(CRServo.class, grabServoName);
+        grabServo = hardwareMap.get(CRServo.class, grabServo1Name);
         grabServo.resetDeviceConfigurationForOpMode();
 
         /*
