@@ -17,6 +17,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.configs.PoseStorage;
+import org.firstinspires.ftc.teamcode.driveobjs.ClawDriver;
+import org.firstinspires.ftc.teamcode.driveobjs.LinearSlideDriver;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 
 @TeleOp
@@ -34,11 +36,13 @@ public class DualControllerDriveTeleOp extends OpMode {
     public static  double constantSpeedMultChangeMult = 0.25;
     private boolean wasPressingDpadUp = false, wasPressingDpadDown = false;
 
+
     //spool stuff
     private DcMotor spoolMotor, armTwo;
     public static double spoolPower = 0.5;
     public static  double armTwoPos = 0;
     public static  double spoolSpeedMultiplier = 0.5;
+    public int target = 0;
 
     //servo stuff
     private CRServo grabServo;
@@ -52,6 +56,8 @@ public class DualControllerDriveTeleOp extends OpMode {
     private SampleMecanumDrive roadrunnerDriver;
     private Pose2d currentPose;
 
+    //claw driver
+    ClawDriver clawDriver;
 
 
     @Override
@@ -60,9 +66,15 @@ public class DualControllerDriveTeleOp extends OpMode {
 
         //drive();
         roadrunnerDrive();
-        moveArm();
+        moveArmWithPID(target);
+        //moveArm();
 
-        armGrab();
+        if (gamepad2.right_bumper)
+            clawDriver.open();
+        else if(gamepad2.left_bumper)
+            clawDriver.close();
+
+        //armGrab();
 
         telemetry.update();
     }
@@ -136,15 +148,40 @@ public class DualControllerDriveTeleOp extends OpMode {
         else wasPressingDpadDown = false;
 
 
-        telemetry.addData("Constant Speed Mult", constantSpeedMult);
+        telemetry.addData("Constant Speed Multiplier", constantSpeedMult);
 
         //sets the speed
         speed = lockSpeed ? constantSpeedMult : gamepad1.right_trigger;
 
-        // sets them to gamepad2
-        // **WARNING POWER VARIABLE**
-        spoolPower = gamepad2.left_stick_y;
-        servoSpeed = gamepad2.right_stick_y;
+        if (Math.abs(gamepad2.right_stick_y) > 0.1) {
+            target += spoolSpeedMultiplier * gamepad2.right_stick_y;
+        }
+        else {
+            if (gamepad2.a){
+                target = LinearSlideDriver.height1;
+            }
+
+            if (gamepad2.b){
+                target = LinearSlideDriver.height2;
+            }
+
+            if (gamepad2.x){
+                target = LinearSlideDriver.height3;
+            }
+
+            if (gamepad2.y){
+                target = LinearSlideDriver.height4;
+            }
+
+        }
+
+        /** @deprecated
+            // sets them to gamepad2
+            // **WARNING POWER VARIABLE**
+            //spoolPower = gamepad2.left_stick_y;
+            //servoSpeed = gamepad2.right_stick_y;
+        */
+
 
     }
 
@@ -188,18 +225,19 @@ public class DualControllerDriveTeleOp extends OpMode {
         powerRL += turn;
     }
 
-
+    /**
+     * @deprecated use moveArmWithPID()
+     */
     private void moveArm(){
 
         spoolMotor.setPower(spoolPower * spoolSpeedMultiplier);
         telemetry.addData("spoolMotor Position", spoolMotor.getCurrentPosition());
     }
 
-
+    private LinearSlideDriver slideDriver;
     /**
      * moves the linear slide with a pid controller that is hopefully correctly implemented
      */
-    private LinearSlideDriver slideDriver;
     private void moveArmWithPID(int target){
         slideDriver.setTarget(target);
         int[] slidePIDOutput = slideDriver.run();
@@ -209,7 +247,9 @@ public class DualControllerDriveTeleOp extends OpMode {
     }
 
 
-
+    /**
+     * @deprecated use clawDriver instead
+     */
     private void armGrab(){
         grabServo.setPower(servoSpeed * servoSpeedMultiplier);
         //telemetry.addData("Servo Position", grabServo.get);
@@ -245,7 +285,7 @@ public class DualControllerDriveTeleOp extends OpMode {
         motorRL.setPower(0);
 
         /**
-         * initializes the arm motors and servos
+         * initializes the arm motors
          * @deprecated use runMotorWithPID() instead
          * exists to keep functionality of older code
          */
@@ -254,6 +294,7 @@ public class DualControllerDriveTeleOp extends OpMode {
         spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spoolMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spoolMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         /**
          * initalizes the spoolMotor's pid controller stuff
@@ -270,5 +311,10 @@ public class DualControllerDriveTeleOp extends OpMode {
         currentPose = PoseStorage.currentPose;
         roadrunnerDriver.setPoseEstimate(currentPose);
 
+
+        /**
+         * initializes the claw driver
+         */
+        clawDriver = new ClawDriver(hardwareMap);
     }
 }

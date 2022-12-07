@@ -1,14 +1,13 @@
-package org.firstinspires.ftc.teamcode.teleops;
+package org.firstinspires.ftc.teamcode.driveobjs;
 
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.spoolMotorName;
 
-import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
+@Config
 public class LinearSlideDriver {
 
     private DcMotor spoolMotor;
@@ -22,6 +21,12 @@ public class LinearSlideDriver {
     private int previous_error, targetEncoderValue = 0;
     private long lastTime = 0;
     private double outputPower = 0;
+
+    //TODO: tune these values
+    public static int height1 = 0;
+    public static int height2 = 100;
+    public static int height3 = 200;
+    public static int height4 = 300;
 
 
     public LinearSlideDriver(HardwareMap hardwareMap){
@@ -55,7 +60,21 @@ public class LinearSlideDriver {
         long lastTime = System.currentTimeMillis();
     }
 
+    public void setTargetHeight1(){
+        targetEncoderValue = height1;
+    }
 
+    public void setTargetHeight2(){
+        targetEncoderValue = height2;
+    }
+
+    public void setTargetHeight3(){
+        targetEncoderValue = height3;
+    }
+
+    public void setTargetHeight4(){
+        targetEncoderValue = height4;
+    }
     /**
      *
      * @return an array containing the target, current, and error values for telemetry
