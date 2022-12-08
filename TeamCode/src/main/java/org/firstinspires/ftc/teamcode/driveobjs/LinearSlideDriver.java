@@ -17,6 +17,7 @@ public class LinearSlideDriver {
     public static double Kp = 1;
     public static double Ki = 1;
     public static double Kd = 1;
+
     private double integral;
     private int previous_error, targetEncoderValue = 0;
     private long lastTime = 0;
@@ -86,5 +87,7 @@ public class LinearSlideDriver {
         return outputValues;
     }
 
-
+    public int getTargetEncoderValue() {
+        return targetEncoderValue;
+    }
 }
