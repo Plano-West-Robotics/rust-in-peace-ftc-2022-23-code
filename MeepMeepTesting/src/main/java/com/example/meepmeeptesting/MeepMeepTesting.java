@@ -12,15 +12,15 @@ public class MeepMeepTesting {
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
+                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15.37)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(-34, 62, Math.toRadians(270)))
-                                .lineToLinearHeading(new Pose2d(-35, 60, Math.toRadians(-90)))
-                                .lineToLinearHeading(new Pose2d(-36, 60, Math.toRadians(0)))
-                                .lineToLinearHeading(new Pose2d(-12, 60, Math.toRadians(0)))
-                                .lineToLinearHeading(new Pose2d(-12, 24, Math.toRadians(0)))
-                                .lineToLinearHeading(new Pose2d(-9, 24, Math.toRadians(0)))
-                                .lineToLinearHeading(new Pose2d(-12, 24, Math.toRadians(0)))
+                        drive.trajectorySequenceBuilder(new Pose2d(-33, 60, Math.toRadians(270)))
+                                .lineToLinearHeading(new Pose2d(-34.4, 60, Math.toRadians(270)))
+                                .lineToLinearHeading(new Pose2d(-34.4, 14, Math.toRadians(270)))
+//                                .lineToLinearHeading(new Pose2d(-12, 60, Math.toRadians(0)))
+//                                .lineToLinearHeading(new Pose2d(-12, 24, Math.toRadians(0)))
+//                                .lineToLinearHeading(new Pose2d(-9, 24, Math.toRadians(0)))
+//                                .lineToLinearHeading(new Pose2d(-12, 24, Math.toRadians(0)))
                                 .build()
                 );
 
