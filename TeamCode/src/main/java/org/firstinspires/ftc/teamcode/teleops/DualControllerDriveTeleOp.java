@@ -4,7 +4,6 @@ import static org.firstinspires.ftc.teamcode.configs.HardwareNames.backLeftMotor
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.backRightMotorName;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.frontLeftMotorName;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.frontRightMotorName;
-import static org.firstinspires.ftc.teamcode.configs.HardwareNames.grabServo1Name;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.spoolMotorName;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -58,6 +57,8 @@ public class DualControllerDriveTeleOp extends OpMode {
 
     //claw driver
     ClawDriver clawDriver;
+    private enum ClawState {open, close}
+    private ClawState clawState = ClawState.close;
 
 
     @Override
@@ -66,14 +67,21 @@ public class DualControllerDriveTeleOp extends OpMode {
 
         //drive();
         roadrunnerDrive();
-        moveArmWithPID(target);
-        //moveArm();
+        //moveArmWithPID(target);
+        moveArm();
 
         if (gamepad2.right_bumper)
-            clawDriver.open();
+            clawState = ClawState.close;
         else if(gamepad2.left_bumper)
-            clawDriver.close();
-
+            clawState = ClawState.open;
+        switch(clawState) {
+            case open:
+                clawDriver.open();
+                break;
+            case close:
+                clawDriver.close();
+                break;
+        }
         //armGrab();
 
         telemetry.update();
@@ -82,8 +90,8 @@ public class DualControllerDriveTeleOp extends OpMode {
     private void roadrunnerDrive() {
 
         Vector2d input = new Vector2d(
-                drive,
-                -strafe
+                drive*constantSpeedMult,
+                -strafe*constantSpeedMult
         );
         //input = input.rotated(-currentPose.getHeading());
         /** Pass in the rotated input + right stick value for rotation
@@ -153,6 +161,10 @@ public class DualControllerDriveTeleOp extends OpMode {
         //sets the speed
         speed = lockSpeed ? constantSpeedMult : gamepad1.right_trigger;
 
+
+        /** currently nonfunctional
+         * TODO: FIX
+
         if (Math.abs(gamepad2.right_stick_y) > 0.1) {
             target += spoolSpeedMultiplier * gamepad2.right_stick_y;
         }
@@ -174,13 +186,16 @@ public class DualControllerDriveTeleOp extends OpMode {
             }
 
         }
+        */
 
         /** @deprecated
-            // sets them to gamepad2
+         * using it anyways
+         */
+        // sets them to gamepad2
             // **WARNING POWER VARIABLE**
-            //spoolPower = gamepad2.left_stick_y;
-            //servoSpeed = gamepad2.right_stick_y;
-        */
+        spoolPower = gamepad2.left_stick_y;
+        //servoSpeed = gamepad2.right_stick_y;
+
 
 
     }
@@ -302,7 +317,7 @@ public class DualControllerDriveTeleOp extends OpMode {
         slideDriver = new LinearSlideDriver(hardwareMap);
 
         //TODO: TEMPORARY FIX TO NOT THROW ERROR
-        grabServo = hardwareMap.get(CRServo.class, grabServo1Name);
+        //grabServo = hardwareMap.get(CRServo.class, grabServo1Name);
 
         /**
          * initializes the roadrunner stuff

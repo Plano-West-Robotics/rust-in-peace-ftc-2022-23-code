@@ -7,5 +7,5 @@
 
 2X:
     Grabber Movements:
-        10 grab
-        11 release
+        20 grab
+        21 release

@@ -4,7 +4,6 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.driveobjs.ActionObject;
@@ -20,13 +19,13 @@ public class F2Autonomous extends EnhancedAutoMode {
             new ActionObject(-36, -60, 90, 0),
             new ActionObject(-36, -60, 0, 0),
             new ActionObject(-12, -60, 0, 0),
-            new ActionObject(-12, -24, 0, 0),
-            new ActionObject(-9, -24, 0, 0),
-            new ActionObject(-12, -24, 0, 0)
+            new ActionObject(-12, -24, 0, 13),
+            new ActionObject(-9, -24, 0, 21),
+            new ActionObject(-12, -24, 0, 12)
     };
 
 
-    private StartTile startTile = null; //startingTile.[tile]
+    private StartTile startTile = StartTile.F2; //startingTile.[tile]
     private int parkPosition = 0;
 
     @Override
