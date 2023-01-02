@@ -1,15 +1,16 @@
 package org.firstinspires.ftc.teamcode.enhancedautos;
 
+import static org.firstinspires.ftc.teamcode.configs.HardwareNames.spoolMotorName;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.driveobjs.ClawDriver;
 import org.firstinspires.ftc.teamcode.driveobjs.aprilTag.AprilTagDetector;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequenceBuilder;
-
-import java.util.Timer;
 
 @Autonomous
 public class fallbackAuto extends LinearOpMode {
@@ -17,6 +18,13 @@ public class fallbackAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         int parkPosition = 0;
         AprilTagDetector detector = null;
+
+        DcMotor spoolMotor = hardwareMap.get(DcMotor.class, spoolMotorName);
+        spoolMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        spoolMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        spoolMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         while (!isStarted() && !isStopRequested()) {
             detector = new AprilTagDetector(hardwareMap);
             while (!isStarted() && !isStopRequested()) {
@@ -46,6 +54,14 @@ public class fallbackAuto extends LinearOpMode {
             parkPosition = 1;
         }
 
+        ClawDriver clawDriver = new ClawDriver(hardwareMap);
+        clawDriver.close();
+        sleep(1000);
+
+        spoolMotor.setPower(1);
+        sleep(1000);
+        spoolMotor.setPower(0);
+
         switch (parkPosition) {
             case 1:
                 setPosition = driver.trajectoryBuilder(new Pose2d())
@@ -59,14 +75,17 @@ public class fallbackAuto extends LinearOpMode {
                 break;
             case 3:
                 setPosition = driver.trajectoryBuilder(new Pose2d())
-                        .strafeRight(28)
+                        .strafeRight(25)
                         .build();
                 break;
 
         }
-        driver.followTrajectory(driver.trajectoryBuilder(new Pose2d()).forward(2).build());
+        driver.followTrajectory(driver.trajectoryBuilder(driver.getPoseEstimate()).forward(2).build());
         driver.followTrajectory(setPosition);
-        driver.followTrajectory(driver.trajectoryBuilder(new Pose2d()). forward(30).build());
+        driver.followTrajectory(driver.trajectoryBuilder(driver.getPoseEstimate()).forward(30).build());
+        while(opModeIsActive()){
+            clawDriver.close();
+        }
     }
 
 

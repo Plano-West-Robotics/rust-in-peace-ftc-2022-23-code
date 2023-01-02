@@ -4,7 +4,6 @@ import static org.firstinspires.ftc.teamcode.configs.HardwareNames.spoolMotorNam
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 @Config
@@ -55,10 +54,11 @@ public class LinearSlideDriver {
     private void init() {
         spoolMotor = hardwareMap.get(DcMotor.class, spoolMotorName);
         spoolMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        //spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spoolMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spoolMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         long lastTime = System.currentTimeMillis();
+        //spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void setTargetHeight1(){
@@ -89,5 +89,8 @@ public class LinearSlideDriver {
 
     public int getTargetEncoderValue() {
         return targetEncoderValue;
+    }
+    public int getCurrentEncoderValue(){
+        return spoolMotor.getCurrentPosition();
     }
 }

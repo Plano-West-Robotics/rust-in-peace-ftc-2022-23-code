@@ -21,9 +21,9 @@ public class testClawDriver extends OpMode {
     @Override
     public void loop() {
         if(gamepad1.x)
-            clawDriver.open();
-        else if(gamepad1.y)
             clawDriver.close();
+        else if(gamepad1.y)
+            clawDriver.open();
     }
 
     @Override

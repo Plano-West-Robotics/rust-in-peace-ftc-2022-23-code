@@ -1,11 +1,7 @@
 package org.firstinspires.ftc.teamcode.driveobjs;
 
 
-import static org.firstinspires.ftc.teamcode.configs.AutoConfig.ArmPosition1EncoderCount;
-import static org.firstinspires.ftc.teamcode.configs.AutoConfig.ArmPosition2EncoderCount;
-import static org.firstinspires.ftc.teamcode.configs.AutoConfig.ArmPosition3EncoderCount;
-import static org.firstinspires.ftc.teamcode.configs.AutoConfig.ArmPosition4EncoderCount;
-import static org.firstinspires.ftc.teamcode.configs.HardwareNames.*;
+import static org.firstinspires.ftc.teamcode.configs.HardwareNames.spoolMotorName;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -15,10 +11,9 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.configs.PoseStorage;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
-
-
 
 import java.util.List;
 
@@ -27,13 +22,17 @@ public class EnhancedDriver extends SampleMecanumDrive{
     private DcMotor spoolMotor;
     private CRServo grabServo;
 
+    private ClawDriver clawDriver;
 
 
     private HardwareMap hardwareMap;
     private boolean isFirstAction = true;
     private TelemetryPacket packet = new TelemetryPacket();
     private FtcDashboard dashboard = FtcDashboard.getInstance();
+    Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
+    private enum ClawState {open, close}
+    private ClawState  clawState = ClawState.close;
 
     public EnhancedDriver(HardwareMap hardwareMap){
         super(hardwareMap);
@@ -43,6 +42,14 @@ public class EnhancedDriver extends SampleMecanumDrive{
 
     public void initPosition(Pose2d startingPos){
         setPoseEstimate(startingPos);
+
+    }
+    public void moveConeOutOfWay(){
+        clawDriver.close();
+        sleep(1000);
+        spoolMotor.setPower(1);
+        sleep(1000);
+        spoolMotor.setPower(0);
     }
 
     public void run(List<ActionObject> actionObjects){
@@ -51,6 +58,11 @@ public class EnhancedDriver extends SampleMecanumDrive{
             //checks for location change, and then moves to that location
             Pose2d newPose = actionObject.getPose2d();
             Pose2d lastPose = getPoseEstimate();
+
+            dashboardTelemetry.addData("x", newPose.getX());
+            dashboardTelemetry.addData("y", newPose.getY());
+            dashboardTelemetry.addData("heading", newPose.getHeading());
+            dashboardTelemetry.update();
 
             //ensures that there is no empty path exception
             if (!(newPose.getX() == lastPose.getX() && newPose.getY() == lastPose.getY())) {
@@ -78,6 +90,15 @@ public class EnhancedDriver extends SampleMecanumDrive{
              * IMPORTANT: THIS EXECUTES AFTER THE MOVEMENT
              */
             executeAction(actionObject.getMethodID());
+            switch(clawState){
+                case open:
+                    clawDriver.open();
+                    break;
+                case close:
+                    clawDriver.close();
+                    break;
+            }
+
         }
     }
 
@@ -132,11 +153,13 @@ public class EnhancedDriver extends SampleMecanumDrive{
     private void turnGrabber(int subIndex) {
         switch(subIndex){
             case 0:
-                grabServo.setPower(0.5);
+                clawDriver.close();
+                clawState = ClawState.close;
                 sleep(1000);
                 break;
             case 1:
-                grabServo.setPower(-0.5);
+                clawDriver.open();
+                clawState = clawState.open;
                 sleep(1000);
                 break;
         }
@@ -144,6 +167,24 @@ public class EnhancedDriver extends SampleMecanumDrive{
 
     private void moveArm(int subIndex) {
         switch(subIndex){
+            case 0:
+                spoolMotor.setPower(1);
+                sleep(100);
+                break;
+            case 2:
+                spoolMotor.setPower(-1);
+                sleep(1000);
+            case 3:
+                spoolMotor.setPower(1);
+                sleep(100);
+                break;
+
+
+
+
+            /**
+             * TODO: Fix encoder issue and implement this
+             *
             case 0:
                 spoolMotor.setTargetPosition(ArmPosition1EncoderCount);
                 spoolMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -164,8 +205,9 @@ public class EnhancedDriver extends SampleMecanumDrive{
                 spoolMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 spoolMotor.setPower(0.5);
                 break;
+             */
         }
-        while(spoolMotor.isBusy()){sleep(1);}
+        //while(spoolMotor.isBusy()){sleep(1);}
     }
 
 
@@ -203,8 +245,10 @@ public class EnhancedDriver extends SampleMecanumDrive{
         spoolMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         spoolMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        grabServo = hardwareMap.get(CRServo.class, grabServo1Name);
-        grabServo.resetDeviceConfigurationForOpMode();
+        clawDriver = new ClawDriver(hardwareMap);
+
+        //grabServo = hardwareMap.get(CRServo.class, grabServo1Name);
+        //grabServo.resetDeviceConfigurationForOpMode();
 
         /*
 

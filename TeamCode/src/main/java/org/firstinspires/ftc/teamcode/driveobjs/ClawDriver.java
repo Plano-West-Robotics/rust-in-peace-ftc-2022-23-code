@@ -11,8 +11,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class ClawDriver{
     public static double claw1Min = 0;
-    public static double claw1Max = 0.55;
-    public static double claw2Min = 0.35;
+    public static double claw1Max = 0.6;
+    public static double claw2Min = 0.30;
     public static double claw2Max = 0.55;
 
 
@@ -25,12 +25,12 @@ public class ClawDriver{
         init();
     }
 
-    public void close(){
+    public void open(){
         clawServo1.setPosition(claw1Min);
         clawServo2.setPosition(claw2Max);
     }
 
-    public void open(){
+    public void close(){
         clawServo1.setPosition(claw1Max);
         clawServo2.setPosition(claw2Min);
     }

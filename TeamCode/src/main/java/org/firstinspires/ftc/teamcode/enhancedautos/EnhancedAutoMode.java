@@ -1,6 +1,12 @@
 package org.firstinspires.ftc.teamcode.enhancedautos;
 
 
+import static org.firstinspires.ftc.teamcode.configs.JunctionPoints.generateJunctionPoints;
+import static org.firstinspires.ftc.teamcode.configs.ParkingLocations.A2Point1;
+import static org.firstinspires.ftc.teamcode.configs.ParkingLocations.A5Point1;
+import static org.firstinspires.ftc.teamcode.configs.ParkingLocations.F2Point1;
+import static org.firstinspires.ftc.teamcode.configs.ParkingLocations.F5Point1;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -11,9 +17,6 @@ import org.firstinspires.ftc.teamcode.driveobjs.ActionObject;
 import org.firstinspires.ftc.teamcode.driveobjs.EnhancedDriver;
 import org.firstinspires.ftc.teamcode.driveobjs.aprilTag.AprilTagDetector;
 
-import static org.firstinspires.ftc.teamcode.configs.JunctionPoints.generateJunctionPoints;
-import static org.firstinspires.ftc.teamcode.configs.ParkingLocations.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,12 +26,14 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
     private FtcDashboard dashboard = FtcDashboard.getInstance();
     private Telemetry dashboardTelemetry = dashboard.getTelemetry();
     enum StartTile {A5, A2, F2, F5}
+    AprilTagDetector detector;
 
     public List<ActionObject> actionObjects =  new ArrayList<>(0);
-    private StartTile startTile;
+    //private StartTile startTile;
 
 
     public void run(){
+        enhancedDriver.moveConeOutOfWay();
 
         enhancedDriver.run(actionObjects);
 
@@ -49,7 +54,8 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
     public void initThings(Pose2d startPos, StartTile startTile, ActionObject[] actionObjects, int parkPosition){
         enhancedDriver = new EnhancedDriver(hardwareMap);
         enhancedDriver.initPosition(startPos);
-        this.actionObjects = new ArrayList<ActionObject>(Arrays.asList(actionObjects));
+        this.actionObjects = new ArrayList<>(Arrays.asList(actionObjects));
+
         List<ActionObject> newLocations = calculateParking(startTile, this.actionObjects, parkPosition);
         for (ActionObject newLocation : newLocations){
             this.actionObjects.add(newLocation);
@@ -79,7 +85,7 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
             dashboardTelemetry.addLine("Collision Detected");
             dashboardTelemetry.update();
             //TODO: Get out of the collision and realign
-            // will probably just backtrack untul no more collision tbh
+            // will probably just backtrack until no more collision tbh
             // we are going to ignore this problem for now and just make the path never end
             // in collision with a junction
 
@@ -89,7 +95,8 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
 
         /**
          * calculates the nearest center of tile
-         */
+         * TODO: MAKE FUNCTIONAL
+         *
         //the x value change in the negative direction
         double closeNegX = -1*((lastPose.getX()+9) % 18);
         //the x value change in the positive direction
@@ -108,13 +115,28 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
                 );
         //adds the nearest center to the list, once to get there, another time to readjust heading
         newLocations.add(new ActionObject(nearestCenter));
+        */
+
+        /** temporary workaround
+         *
+         */
+        switch(startTile){
+            case F2:
+            case F5:
+                newLocations.add(new ActionObject(new Pose2d(lastX, -12, lastHeading)));
+                break;
+            case A2:
+            case A5:
+                newLocations.add(new ActionObject(new Pose2d(lastX, 12, lastHeading)));
+        }
+
 
         /**
          * first checks to see if it is already in position
          * if so, just adjusts the heading accordingly and returns the locations
          */
 
-        if (Math.abs(nearestCenter.getX() - parkingGoal.getX()) < 4 && Math.abs(nearestCenter.getY() - parkingGoal.getY()) < 4) {
+        if (Math.abs(newLocations.get(newLocations.size()-1).getPose2d().getX() - parkingGoal.getX()) < 4 && Math.abs(newLocations.get(newLocations.size()-1).getPose2d().getY() - parkingGoal.getY()) < 4) {
             newLocations.add(new ActionObject(parkingGoal));
             return newLocations;
         }
@@ -193,9 +215,9 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
         //offsets those lines based on the parking position
         switch(parkPosition){
             case(3):
-                parkingGoal = new Pose2d(parkingGoal.getX()+18, parkingGoal.getY()+18);
+                parkingGoal = new Pose2d(parkingGoal.getX()+24, parkingGoal.getY());
             case(2):
-                parkingGoal = new Pose2d(parkingGoal.getX()+18, parkingGoal.getY()+18);
+                parkingGoal = new Pose2d(parkingGoal.getX()+24, parkingGoal.getY());
             case(1):
                 break;
         }
@@ -205,9 +227,9 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
 
 
     public int readAprilTag(){
-        AprilTagDetector detector = new AprilTagDetector(hardwareMap);
+        detector = new AprilTagDetector(hardwareMap);
         int pos = detector.getPos();
-        detector.endStream();
+        //detector.endStream();
 
         //store it in the form of a Pose2D to parkLocation if you would
         return pos;
