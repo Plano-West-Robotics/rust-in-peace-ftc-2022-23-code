@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.configs.HardwareNames.backLeftMotor
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.backRightMotorName;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.frontLeftMotorName;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.frontRightMotorName;
+import static org.firstinspires.ftc.teamcode.configs.HardwareNames.grabServo1Name;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.spoolMotorName;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -57,25 +58,98 @@ public class MonoControllerDriveTeleOp extends OpMode {
 
     //claw driver
     ClawDriver clawDriver;
-
+//    private enum ClawState {open, close}
+//    private DualControllerDriveTeleOp.ClawState clawState = DualControllerDriveTeleOp.ClawState.close;
 
     @Override
     public void loop() {
         takeControllerInput();
 
-        //drive();
+//        drive();
+
         roadrunnerDrive();
-        //moveArmWithPID(target);
+
         moveArm();
 
-        if (gamepad1.right_bumper)
-            clawDriver.close();
-        else if(gamepad1.left_bumper)
+        if (gamepad1.right_trigger >= 0.5)
             clawDriver.open();
+        else if(gamepad1.left_trigger >= 0.5)
+            clawDriver.close();
 
-        //armGrab();
+//        armGrab();
 
         telemetry.update();
+    }
+
+    private void takeControllerInput(){
+        /**
+         * reads all of the controller inputs
+         */
+        drive = -1*gamepad1.left_stick_y;
+        strafe = gamepad1.left_stick_x;
+        turn = gamepad1.right_stick_x;
+
+        /**
+         * deprecated code, exists here for posterity and in case of
+         * request for reimplementation
+         *
+         //if A is pressed, it will unlock more variable speed control, else will run at constantSpeedMult
+         if (gamepad1.a) {
+         if (!wasPressingA) {
+         lockSpeed = !lockSpeed;
+         }
+         wasPressingA = true;
+         }
+         else wasPressingA = false;
+         */
+
+        //every time the button is pressed, changes the speed multiplier by constantSpeedMultChangeMult
+        if (gamepad1.dpad_up) {
+            if (!wasPressingDpadUp) {
+                constantSpeedMult = Math.min(constantSpeedMult+constantSpeedMultChangeMult, 1);
+            }
+            wasPressingDpadUp = true;
+        }
+        else wasPressingDpadUp = false;
+
+        if (gamepad1.dpad_down) {
+            if (!wasPressingDpadDown) {
+                constantSpeedMult = Math.max(constantSpeedMult-constantSpeedMultChangeMult, 0);
+            }
+            wasPressingDpadDown = true;
+        }
+        else wasPressingDpadDown = false;
+
+
+        telemetry.addData("Constant Speed Mult", constantSpeedMult);
+
+        //sets the speed
+        speed = lockSpeed ? constantSpeedMult : gamepad1.right_trigger;
+
+        // messes with them to get them on gamepad 1
+
+        // sets the spoolState
+        /**
+        if (gamepad1.right_bumper){
+            if (spoolState != SpoolState.PAUSED){
+                spoolState = SpoolState.PAUSED;
+            }
+            else {
+                spoolState = SpoolState.LIFTING;
+            }
+        }
+        else if (gamepad1.left_bumper){
+            if (spoolState != SpoolState.PAUSED){
+                spoolState = SpoolState.PAUSED;
+            }
+            else {
+                spoolState = SpoolState.LOWERING;
+            }
+        }
+        */
+        spoolPower = (gamepad1.left_bumper ? 1 : 0) - (gamepad1.right_bumper ? 1 : 0);
+//        servoSpeed = gamepad1.right_trigger - gamepad1.left_trigger;
+
     }
 
     private void roadrunnerDrive() {
@@ -107,99 +181,6 @@ public class MonoControllerDriveTeleOp extends OpMode {
 
     }
 
-    private void takeControllerInput(){
-        /**
-         * reads all of the controller inputs
-         */
-        drive = -1*gamepad1.left_stick_y;
-        strafe = gamepad1.left_stick_x;
-        turn = gamepad1.right_stick_x;
-
-        /**
-         * deprecated code, exists here for posterity and in case of
-         * request for reimplementation
-         *
-        //if A is pressed, it will unlock more variable speed control, else will run at constantSpeedMult
-        if (gamepad1.a) {
-            if (!wasPressingA) {
-                lockSpeed = !lockSpeed;
-            }
-            wasPressingA = true;
-        }
-        else wasPressingA = false;
-        */
-        /**
-        //every time the button is pressed, changes the speed multiplier by constantSpeedMultChangeMult
-        if (gamepad1.dpad_up) {
-            if (!wasPressingDpadUp) {
-                constantSpeedMult = Math.min(constantSpeedMult+constantSpeedMultChangeMult, 1);
-            }
-            wasPressingDpadUp = true;
-        }
-        else wasPressingDpadUp = false;
-
-        if (gamepad1.dpad_down) {
-            if (!wasPressingDpadDown) {
-                constantSpeedMult = Math.max(constantSpeedMult-constantSpeedMultChangeMult, 0);
-            }
-            wasPressingDpadDown = true;
-        }
-        else wasPressingDpadDown = false;
-        */
-
-        telemetry.addData("Constant Speed Multiplier", constantSpeedMult);
-
-        //sets the speed
-        speed = lockSpeed ? constantSpeedMult : gamepad1.right_trigger;
-
-
-        /** currently nonfunctional
-         * TODO: FIX
-
-        if (Math.abs(gamepad2.right_stick_y) > 0.1) {
-            target += spoolSpeedMultiplier * gamepad2.right_stick_y;
-        }
-        else {
-            if (gamepad2.a){
-                target = LinearSlideDriver.height1;
-            }
-
-            if (gamepad2.b){
-                target = LinearSlideDriver.height2;
-            }
-
-            if (gamepad2.x){
-                target = LinearSlideDriver.height3;
-            }
-
-            if (gamepad2.y){
-                target = LinearSlideDriver.height4;
-            }
-
-        }
-        */
-
-        /** @deprecated
-         * using it anyways
-         */
-        // sets them to gamepad2
-            // **WARNING POWER VARIABLE**
-        if (gamepad1.dpad_up)
-            spoolPower = 1;
-        else if (gamepad1.dpad_down)
-            spoolPower = -1;
-        else
-            spoolPower = 0;
-        //servoSpeed = gamepad2.right_stick_y;
-
-
-
-    }
-
-    /**
-     * @deprecated use roadRunnerDrive
-     * here for posterity only
-     */
     private void drive(){
 
         powerFR = drive - strafe;
@@ -225,10 +206,6 @@ public class MonoControllerDriveTeleOp extends OpMode {
 
     }
 
-    /**
-     * @deprecated use roadRunnerDrive
-     * here for posterity only
-     */
     private void addTurn(double turn){
         powerFR -= turn;
         powerRR -= turn;
@@ -236,34 +213,28 @@ public class MonoControllerDriveTeleOp extends OpMode {
         powerRL += turn;
     }
 
-    /**
-     * @deprecated use moveArmWithPID()
-     */
-    private void moveArm(){
 
+    private void moveArm(){
+        /**
+        switch(spoolState){
+            case LIFTING:
+                spoolMotor.setPower(-spoolPower);
+                break;
+            case LOWERING:
+                spoolMotor.setPower(spoolPower);
+                break;
+            case PAUSED:
+
+        }
+         */
         spoolMotor.setPower(spoolPower * spoolSpeedMultiplier);
         telemetry.addData("spoolMotor Position", spoolMotor.getCurrentPosition());
     }
 
-    private LinearSlideDriver slideDriver;
-    /**
-     * moves the linear slide with a pid controller that is hopefully correctly implemented
-     */
-    private void moveArmWithPID(int target){
-        slideDriver.setTarget(target);
-        int[] slidePIDOutput = slideDriver.run();
-        telemetry.addData("Slide Target", slidePIDOutput[0]);
-        telemetry.addData("Slide Current", slidePIDOutput[1]);
-        telemetry.addData("Slide Error", slidePIDOutput[2]);
-    }
-
-
-    /**
-     * @deprecated use clawDriver instead
-     */
     private void armGrab(){
+
         grabServo.setPower(servoSpeed * servoSpeedMultiplier);
-        //telemetry.addData("Servo Position", grabServo.get);
+        telemetry.addData("Servo Speed", servoSpeed);
     }
 
 
@@ -310,7 +281,7 @@ public class MonoControllerDriveTeleOp extends OpMode {
         /**
          * initalizes the spoolMotor's pid controller stuff
          */
-        slideDriver = new LinearSlideDriver(hardwareMap);
+//        slideDriver = new LinearSlideDriver(hardwareMap);
 
         //TODO: TEMPORARY FIX TO NOT THROW ERROR
         //grabServo = hardwareMap.get(CRServo.class, grabServo1Name);
