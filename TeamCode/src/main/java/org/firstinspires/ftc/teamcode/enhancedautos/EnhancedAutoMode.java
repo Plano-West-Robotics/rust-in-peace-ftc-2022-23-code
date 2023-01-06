@@ -213,17 +213,34 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
         }
 
         //offsets those lines based on the parking position
-        switch(parkPosition){
-            case(3):
-                parkingGoal = new Pose2d(parkingGoal.getX()+24, parkingGoal.getY());
-            case(2):
-                parkingGoal = new Pose2d(parkingGoal.getX()+24, parkingGoal.getY());
-            case(1):
-                break;
+
+        //blue offset
+        if (startTile == StartTile.A2 || startTile == StartTile.A5) {
+            switch (parkPosition) {
+                case (1):
+                    parkingGoal = new Pose2d(parkingGoal.getX() + 24, parkingGoal.getY());
+                case (2):
+                    parkingGoal = new Pose2d(parkingGoal.getX() + 24, parkingGoal.getY());
+                case (3):
+                    break;
+            }
+        }
+        //red offset
+        else if (startTile == StartTile.F2 || startTile == StartTile.F5) {
+            switch (parkPosition) {
+                case (3):
+                    parkingGoal = new Pose2d(parkingGoal.getX() + 24, parkingGoal.getY());
+                case (2):
+                    parkingGoal = new Pose2d(parkingGoal.getX() + 24, parkingGoal.getY());
+                case (1):
+                    break;
+            }
         }
 
         return parkingGoal;
     }
+
+
 
 
     public int readAprilTag(){

@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.troubleshooting;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.driveobjs.LinearSlideDriver;
 
 @Autonomous
@@ -14,6 +16,8 @@ public class LinearSlideTuner extends LinearOpMode {
     public static double speedMultiplier = 1;
     public static int max = 500;
     public static int min = 100;
+    private FtcDashboard dashboard = FtcDashboard.getInstance();
+    private Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
     public void runOpMode(){
         linearSlideDriver = new LinearSlideDriver(hardwareMap);
@@ -41,7 +45,7 @@ public class LinearSlideTuner extends LinearOpMode {
                     target += gamepad1.right_stick_y * speedMultiplier;
                 }
 
-                telemetry.addData("Target Height", linearSlideDriver.getTargetEncoderValue());
+                dashboardTelemetry.addData("Target Height", linearSlideDriver.getTargetEncoderValue());
 
 
                 if (gamepad1.a) {
@@ -70,10 +74,10 @@ public class LinearSlideTuner extends LinearOpMode {
 
             linearSlideDriver.setTarget(target);
             int[] slidePIDOutput = linearSlideDriver.run();
-            telemetry.addData("Slide Target", slidePIDOutput[0]);
-            telemetry.addData("Slide Current", slidePIDOutput[1]);
-            telemetry.addData("Slide Error", slidePIDOutput[2]);
-            telemetry.update();
+            dashboardTelemetry.addData("Slide Target", slidePIDOutput[0]);
+            dashboardTelemetry.addData("Slide Current", slidePIDOutput[1]);
+            dashboardTelemetry.addData("Slide Error", slidePIDOutput[2]);
+            dashboardTelemetry.update();
 
         }
     }

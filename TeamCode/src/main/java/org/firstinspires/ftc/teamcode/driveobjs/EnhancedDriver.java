@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.configs.ArmPosStorage;
 import org.firstinspires.ftc.teamcode.configs.PoseStorage;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 
@@ -33,6 +34,8 @@ public class EnhancedDriver extends SampleMecanumDrive{
 
     private enum ClawState {open, close}
     private ClawState  clawState = ClawState.close;
+
+    private int stackIndex = 0;
 
     public EnhancedDriver(HardwareMap hardwareMap){
         super(hardwareMap);
@@ -98,6 +101,7 @@ public class EnhancedDriver extends SampleMecanumDrive{
                     clawDriver.close();
                     break;
             }
+
 
         }
     }
@@ -165,22 +169,27 @@ public class EnhancedDriver extends SampleMecanumDrive{
         }
     }
 
+
+
     private void moveArm(int subIndex) {
+        int currentPos = spoolMotor.getCurrentPosition();
         switch(subIndex){
             case 0:
-                spoolMotor.setPower(1);
-                sleep(100);
+                spoolMotor.setTargetPosition(ArmPosStorage.ArmPos0);
+                break;
+            case 1:
+                spoolMotor.setTargetPosition(ArmPosStorage.ArmPos1);
                 break;
             case 2:
-                spoolMotor.setPower(-1);
-                sleep(1000);
-            case 3:
-                spoolMotor.setPower(1);
-                sleep(100);
+                spoolMotor.setTargetPosition(ArmPosStorage.ArmPos2);
                 break;
-
-
-
+            case 3:
+                spoolMotor.setTargetPosition(ArmPosStorage.ArmPos3);
+                break;
+            case 4:
+                spoolMotor.setTargetPosition(ArmPosStorage.stackArmPoses[stackIndex]);
+                stackIndex++;
+                break;
 
             /**
              * TODO: Fix encoder issue and implement this
@@ -206,7 +215,20 @@ public class EnhancedDriver extends SampleMecanumDrive{
                 spoolMotor.setPower(0.5);
                 break;
              */
+
         }
+        if (spoolMotor.getTargetPosition() > spoolMotor.getCurrentPosition()){
+            spoolMotor.setPower(1);
+        }
+        else{
+            spoolMotor.setPower(-1);
+        }
+
+
+        while (spoolMotor.isBusy()) {}
+        //spoolMotor.setPower(0.01);
+
+        spoolMotor.setPower(0);
         //while(spoolMotor.isBusy()){sleep(1);}
     }
 

@@ -7,21 +7,25 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.driveobjs.ActionObject;
+import org.firstinspires.ftc.teamcode.driveobjs.aprilTag.AprilTagDetector;
 
 @Autonomous (group = "Full Parking")
 @Config
 public class F2Autonomous extends EnhancedAutoMode {
     FtcDashboard dashboard = FtcDashboard.getInstance();
     Telemetry dashboardTelemetry = dashboard.getTelemetry();
-    public static Pose2d startingPos = new Pose2d(-34, -62, Math.toRadians(90));
+    public static Pose2d startingPos = new Pose2d(-38, -63, Math.toRadians(90));
 
     public static ActionObject[] actionObjectList = {
             new ActionObject(-36, -60, 90, 0),
-            new ActionObject(-36, -60, 0, 0),
-            new ActionObject(-12, -60, 0, 0),
-            new ActionObject(-12, -24, 0, 13),
-            new ActionObject(-9, -24, 0, 21),
-            new ActionObject(-12, -24, 0, 12)
+            new ActionObject(-12, -60, 90, 0),
+            new ActionObject(-12,-36, 90, 0 ),
+            new ActionObject(-12,-36, 0, 0 ),
+            new ActionObject(-12, -26, 0, 13),
+            new ActionObject(-7, -26, 0, 12),
+            new ActionObject(-7, -26, 0, 21),
+            new ActionObject(-14, -26, 0, 0),
+            new ActionObject(-14, -13, 0, 0)
     };
 
 
@@ -31,10 +35,12 @@ public class F2Autonomous extends EnhancedAutoMode {
     @Override
     public void runOpMode(){
 
-        initThings(startingPos, startTile, actionObjectList, parkPosition);
-
+        detector = new AprilTagDetector(hardwareMap);
         while (!isStarted() && !isStopRequested()) {
-            parkPosition = readAprilTag();
+            parkPosition = detector.getPos();
+            telemetry.addLine(String.format("\nDetected tag ID=%d", parkPosition));
+            telemetry.update();
+            sleep(50);
         }
 
         initThings(startingPos, startTile, actionObjectList, parkPosition);

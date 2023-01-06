@@ -1,5 +1,21 @@
 package org.firstinspires.ftc.teamcode.roadRunner.drive;
 
+import static org.firstinspires.ftc.teamcode.configs.HardwareNames.backLeftMotorName;
+import static org.firstinspires.ftc.teamcode.configs.HardwareNames.backRightMotorName;
+import static org.firstinspires.ftc.teamcode.configs.HardwareNames.frontLeftMotorName;
+import static org.firstinspires.ftc.teamcode.configs.HardwareNames.frontRightMotorName;
+import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.MAX_ACCEL;
+import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.MAX_ANG_ACCEL;
+import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.MAX_ANG_VEL;
+import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.MAX_VEL;
+import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.MOTOR_VELO_PID;
+import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.RUN_USING_ENCODER;
+import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.TRACK_WIDTH;
+import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.encoderTicksToInches;
+import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.kA;
+import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.kStatic;
+import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.kV;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -36,28 +52,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.MAX_ACCEL;
-import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.MAX_ANG_ACCEL;
-import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.MAX_ANG_VEL;
-import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.MAX_VEL;
-import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.MOTOR_VELO_PID;
-import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.RUN_USING_ENCODER;
-import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.TRACK_WIDTH;
-import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.encoderTicksToInches;
-import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.kA;
-import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.kStatic;
-import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.kV;
-
-import static org.firstinspires.ftc.teamcode.configs.HardwareNames.*;
-
 
 /*
  * Simple mecanum drive hardware implementation for REV hardware.
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(10, 0, 1);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(3, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(8, 0, 1);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(7, 0, 0);
 
     public static double LATERAL_MULTIPLIER = 1.15805894878;
 
@@ -293,10 +295,11 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
-        leftFront.setPower(v);
-        leftRear.setPower(v1);
-        rightRear.setPower(v2);
-        rightFront.setPower(v3);
+        double multiplier = 12.5 / batteryVoltageSensor.getVoltage();
+        leftFront.setPower(multiplier * v);
+        leftRear.setPower(multiplier * v1);
+        rightRear.setPower(multiplier * v2);
+        rightFront.setPower(multiplier * v3);
     }
 
     @Override
