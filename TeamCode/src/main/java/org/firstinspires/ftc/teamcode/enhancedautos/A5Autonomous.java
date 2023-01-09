@@ -26,14 +26,14 @@ public class A5Autonomous extends EnhancedAutoMode {
             new ActionObject(12,36, 270, 0 ),
             new ActionObject(12,36, 180, 0 ),
             new ActionObject(12, 24.5, 180, 13),
-            new ActionObject(6.5, 24.5, 180, 12),
-            new ActionObject(6.5, 24.5, 180, 21),
+            new ActionObject(5, 24.5, 180, 12),
+            new ActionObject(5, 24.5, 180, 21),
             new ActionObject(14, 24.5, 180, 0),
             new ActionObject(14, 13, 180, 0),
 
             /**
              * this section picks up more cones
-            */
+
             new ActionObject(14, 13, 0, 0),
             new ActionObject(14, 13, 0, 0),
 
@@ -45,6 +45,7 @@ public class A5Autonomous extends EnhancedAutoMode {
             new ActionObject(24, 6, -90, 21),
             new ActionObject(24, 11, -90, 0),
             new ActionObject(62, 11, 0, 14),
+             */
     };
 
 

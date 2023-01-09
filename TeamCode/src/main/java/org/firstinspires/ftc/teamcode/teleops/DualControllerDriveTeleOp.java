@@ -40,7 +40,7 @@ public class DualControllerDriveTeleOp extends OpMode {
     private DcMotor spoolMotor, armTwo;
     public static double spoolPower = 0.5;
     public static  double armTwoPos = 0;
-    public static  double spoolSpeedMultiplier = 0.5;
+    public static  double spoolSpeedMultiplier = 1;
     public int target = 0;
 
     //servo stuff

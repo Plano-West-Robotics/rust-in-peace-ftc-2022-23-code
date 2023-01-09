@@ -21,10 +21,10 @@ public class F2Autonomous extends EnhancedAutoMode {
             new ActionObject(-12, -60, 90, 0),
             new ActionObject(-12,-36, 90, 0 ),
             new ActionObject(-12,-36, 0, 0 ),
-            new ActionObject(-12, -26, 0, 13),
-            new ActionObject(-7, -26, 0, 12),
-            new ActionObject(-7, -26, 0, 21),
-            new ActionObject(-14, -26, 0, 0),
+            new ActionObject(-12, -23, 0, 13),
+            new ActionObject(-5, -23, 0, 12),
+            new ActionObject(-5, -23, 0, 21),
+            new ActionObject(-14, -23, 0, 0),
             new ActionObject(-14, -13, 0, 0)
     };
 

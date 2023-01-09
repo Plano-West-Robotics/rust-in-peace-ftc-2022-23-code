@@ -22,9 +22,9 @@ public class A2Autonomous extends EnhancedAutoMode {
             new ActionObject(-12, 60, -90, 0),
             new ActionObject(-12,36, -90, 0 ),
             new ActionObject(-12,36, 0, 0 ),
-            new ActionObject(-12, 25, 0, 13),
-            new ActionObject(-4.5, 25, 0, 12),
-            new ActionObject(-4.5, 25, 0, 21),
+            new ActionObject(-12, 26, 0, 13),
+            new ActionObject(-4.5, 26, 0, 12),
+            new ActionObject(-4.5, 26, 0, 21),
             new ActionObject(-13, 25, 0, 0),
             new ActionObject(-13, 13, 0, 0)
     };
