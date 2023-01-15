@@ -13,10 +13,14 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.configs.PoseStorage;
 import org.firstinspires.ftc.teamcode.driveobjs.ActionObject;
+import org.firstinspires.ftc.teamcode.driveobjs.ActionObjectOld;
+import org.firstinspires.ftc.teamcode.driveobjs.DriverMethodQueue;
 import org.firstinspires.ftc.teamcode.driveobjs.EnhancedDriver;
 import org.firstinspires.ftc.teamcode.driveobjs.aprilTag.AprilTagDetector;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,12 +31,15 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
     private Telemetry dashboardTelemetry = dashboard.getTelemetry();
     enum StartTile {A5, A2, F2, F5}
     AprilTagDetector detector;
+    Method[] enhancedDriverMethods;
+    DriverMethodQueue queue;
 
-    public List<ActionObject> actionObjects =  new ArrayList<>(0);
+    public List<ActionObjectOld> actionObjects =  new ArrayList<>(0);
     //private StartTile startTile;
 
 
     public void run(){
+
         enhancedDriver.moveConeOutOfWay();
 
         enhancedDriver.run(actionObjects);
@@ -40,33 +47,120 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
         Pose2d currentPosition = enhancedDriver.getPoseEstimate();
         double currentX = currentPosition.getX();
         double currentY = currentPosition.getY();
+        PoseStorage.currentPose = currentPosition;
     }
 
+    public void runQueue() {
+        for (int i = 0; i < queue.length(); i++) {
+            ActionObject actionObject = queue.getActionObject(i);
+            boolean beenExecuted = false;
+
+            //cycles through all the methods and if there is a match for the method, invokes it
+            for (Method method : enhancedDriverMethods) {
+
+                if (checkMatch(method, actionObject)) {
+                    //dumps args into a new array that puts the enhancedDriver at the front
+                    Object[] originalArgs = actionObject.getArgs();
+                    Object[] args = new Object[originalArgs.length + 1];
+                    args[0] = enhancedDriver;
+                    for (int j = 1; j < args.length; j++) {
+                        args[j] = originalArgs[j - 1];
+                    }
+                    try {
+                        beenExecuted = true;
+                        method.invoke(args);
+                    } catch (Exception e) {
+                        dashboardTelemetry.addLine("ERROR WITH METHOD CALL");
+                        dashboardTelemetry.addLine(e.getMessage());
+                        dashboardTelemetry.update();
+                        sleep(10000);
+
+
+                    }
+                }
+                if (!beenExecuted) {
+                    dashboardTelemetry.addLine("Method was not executed");
+                    dashboardTelemetry.addLine("Method: " + method.getName());
+                    dashboardTelemetry.update();
+                    sleep(10000);
+                }
+            }
+        }
+    }
+
+    /**
+     * this code should check if the method matched the method requested in actionObject
+     * @param method the method that we are checking
+     * @param actionObject the actionObject that contains the method and args
+     * @return returns true if they match, else returns false
+     */
+    public boolean checkMatch(Method method, ActionObject actionObject){
+        if (method.getName().equals(actionObject.getMethodName()))
+            return false;
+
+        Class<?>[] parameters =  method.getParameterTypes();
+        Object[] args = actionObject.getArgs();
+
+        //first does the obvious length match
+        if (parameters.length != args.length)
+            return false;
+
+        //please work please work please work
+        for (int i = 0; i < parameters.length; i++){
+            Object argument = args[i];
+            Class<?> parameterType = parameters[i];
+            if (!parameterType.isInstance(argument)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+
+
     // basic initialization, does not calulate the rest of the parking path
-    public void initThings(Pose2d startPos, StartTile startTile, ActionObject[] actionObjects){
+    public void initThings(Pose2d startPos, StartTile startTile, ActionObjectOld[] actionObjects){
         enhancedDriver = new EnhancedDriver(hardwareMap);
         enhancedDriver.initPosition(startPos);
-        this.actionObjects = new ArrayList<ActionObject>(Arrays.asList(actionObjects));
+        this.actionObjects = new ArrayList<ActionObjectOld>(Arrays.asList(actionObjects));
     }
 
     // implements the calculate parking to automatic calculate the parking position from the final position
     // TODO: DOES NOT UNCOLLIDE ITSELF FROM JUNCTION YET
-    public void initThings(Pose2d startPos, StartTile startTile, ActionObject[] actionObjects, int parkPosition){
+    public void initThings(Pose2d startPos, StartTile startTile, ActionObjectOld[] actionObjects, int parkPosition){
         enhancedDriver = new EnhancedDriver(hardwareMap);
         enhancedDriver.initPosition(startPos);
         this.actionObjects = new ArrayList<>(Arrays.asList(actionObjects));
 
-        List<ActionObject> newLocations = calculateParking(startTile, this.actionObjects, parkPosition);
-        for (ActionObject newLocation : newLocations){
+        List<ActionObjectOld> newLocations = calculateParking(startTile, this.actionObjects, parkPosition);
+        for (ActionObjectOld newLocation : newLocations){
             this.actionObjects.add(newLocation);
         }
     }
 
-    public ArrayList<ActionObject> calculateParking(StartTile startTile, List<ActionObject> actionObjects, int parkPosition){
+    public void initThings(){
+
+    }
+
+
+    public void reflectMethods(){
+        Class EnhancedDriver = enhancedDriver.getClass();
+        enhancedDriverMethods = EnhancedDriver.getDeclaredMethods();
+
+
+    }
+
+
+
+
+
+
+    public ArrayList<ActionObjectOld> calculateParking(StartTile startTile, List<ActionObjectOld> actionObjects, int parkPosition){
         //TODO: Everything
 
-        ArrayList<ActionObject> newLocations = new ArrayList<>(0);
-        ActionObject lastPosition = actionObjects.get(actionObjects.size()-1);
+        ArrayList<ActionObjectOld> newLocations = new ArrayList<>(0);
+        ActionObjectOld lastPosition = actionObjects.get(actionObjects.size()-1);
 
 
         Pose2d lastPose = lastPosition.getPose2d();
@@ -123,11 +217,11 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
         switch(startTile){
             case F2:
             case F5:
-                newLocations.add(new ActionObject(new Pose2d(lastX, -12, lastHeading)));
+                newLocations.add(new ActionObjectOld(new Pose2d(lastX, -12, lastHeading)));
                 break;
             case A2:
             case A5:
-                newLocations.add(new ActionObject(new Pose2d(lastX, 12, lastHeading)));
+                newLocations.add(new ActionObjectOld(new Pose2d(lastX, 12, lastHeading)));
         }
 
 
@@ -137,7 +231,7 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
          */
 
         if (Math.abs(newLocations.get(newLocations.size()-1).getPose2d().getX() - parkingGoal.getX()) < 4 && Math.abs(newLocations.get(newLocations.size()-1).getPose2d().getY() - parkingGoal.getY()) < 4) {
-            newLocations.add(new ActionObject(parkingGoal));
+            newLocations.add(new ActionObjectOld(parkingGoal));
             return newLocations;
         }
 
@@ -146,9 +240,9 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
          * moves onto the "rail line" first after turning to the correct orientation
          */
         Pose2d lastNewPose = newLocations.get(newLocations.size()-1).getPose2d();
-        newLocations.add(new ActionObject(new Pose2d(lastNewPose.getX(), lastNewPose.getY(), parkingGoal.getHeading())));
-        newLocations.add(new ActionObject(new Pose2d(lastNewPose.getX(), parkingGoal.getY(), parkingGoal.getHeading())));
-        newLocations.add(new ActionObject(parkingGoal));
+        newLocations.add(new ActionObjectOld(new Pose2d(lastNewPose.getX(), lastNewPose.getY(), parkingGoal.getHeading())));
+        newLocations.add(new ActionObjectOld(new Pose2d(lastNewPose.getX(), parkingGoal.getY(), parkingGoal.getHeading())));
+        newLocations.add(new ActionObjectOld(parkingGoal));
 
 
         return newLocations;
