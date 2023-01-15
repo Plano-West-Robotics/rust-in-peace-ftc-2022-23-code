@@ -59,6 +59,8 @@ public class DualControllerDriveTeleOp extends OpMode {
     ClawDriver clawDriver;
     private enum ClawState {open, close}
     private ClawState clawState = ClawState.close;
+    private enum DriveState {field, regular}
+    private DriveState driveState = DriveState.regular;
 
 
     @Override
@@ -88,12 +90,26 @@ public class DualControllerDriveTeleOp extends OpMode {
     }
 
     private void roadrunnerDrive() {
+        if (gamepad1.a){
+            roadrunnerDriver.setPoseEstimate(new Pose2d(0, 0, 0));
+        }
+        if (gamepad1.y){
+            driveState = DriveState.regular;
+        }
+        if (gamepad1.x){
+            driveState = DriveState.field;
+        }
+
 
         Vector2d input = new Vector2d(
                 drive*constantSpeedMult,
                 -strafe*constantSpeedMult
         );
-        //input = input.rotated(-currentPose.getHeading());
+
+        if (driveState == DriveState.field){
+            input = input.rotated(-roadrunnerDriver.getPoseEstimate().getHeading());
+        }
+
         /** Pass in the rotated input + right stick value for rotation
          * Rotation is not part of the rotated input thus must be passed in separately
          */
