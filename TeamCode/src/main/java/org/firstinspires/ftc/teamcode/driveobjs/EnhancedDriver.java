@@ -55,9 +55,9 @@ public class EnhancedDriver extends SampleMecanumDrive{
         spoolMotor.setPower(0);
     }
 
-    public void run(List<ActionObject> actionObjects){
+    public void run(List<ActionObjectOld> actionObjects){
         //setPoseEstimate(actionObjects.remove(0).getPose2d());
-        for(ActionObject actionObject : actionObjects) {
+        for(ActionObjectOld actionObject : actionObjects) {
             //checks for location change, and then moves to that location
             Pose2d newPose = actionObject.getPose2d();
             Pose2d lastPose = getPoseEstimate();
@@ -106,6 +106,35 @@ public class EnhancedDriver extends SampleMecanumDrive{
         }
     }
 
+    public void driveTo(Pose2d targetPose){
+
+        //ensures that there is no empty path exception
+        if (!(targetPose.getX() == getPoseEstimate().getX() && targetPose.getY() == getPoseEstimate().getY())) {
+            Trajectory traj = trajectoryBuilder(getPoseEstimate())
+                    .lineToLinearHeading(targetPose)
+                    .build();
+            followTrajectory(traj);
+        }
+        //if there is an empty path, checks to see if there is an angle change, if so, executes that angle change
+        else if (targetPose.getHeading() != getPoseEstimate().getHeading()){
+            Trajectory traj = trajectoryBuilder(getPoseEstimate())
+                    .lineToLinearHeading(new Pose2d(getPoseEstimate().getX(), getPoseEstimate().getY()-0.01, targetPose.getHeading()))
+                    .lineToLinearHeading(targetPose)
+                    .build();
+            followTrajectory(traj);
+
+        }
+    }
+
+    /**
+     * this should simply allow for this to be exposed
+     * @param angle
+     */
+    public void turn(double angle){
+        super.turn(angle);
+    }
+
+
 
     /*
      public void act(ActionObject args) {
@@ -153,6 +182,9 @@ public class EnhancedDriver extends SampleMecanumDrive{
 
 
     }
+
+
+
 
     private void turnGrabber(int subIndex) {
         switch(subIndex){
