@@ -17,9 +17,22 @@ public class MeepMeepF5 {
                         drive.trajectorySequenceBuilder(new Pose2d(34, -63, Math.toRadians(90)))
                                 .splineToConstantHeading(new Vector2d(12, -55), Math.toRadians(90))
                                 .lineToConstantHeading(new Vector2d(12, -42))
+                                .addDisplacementMarker(()->{
+                                    //enhancedDriver.moveArm(3);
+                                })
                                 .lineToSplineHeading(new Pose2d(12, -30, Math.toRadians(180)))
-                                .lineToConstantHeading(new Vector2d(12, -4))
-
+                                //.lineToConstantHeading(new Vector2d(12, -24))
+                                .splineToConstantHeading(new Vector2d(5, -26), Math.toRadians(180))
+                                .addDisplacementMarker(()->{
+                                    //enhancedDriver.moveArm(2);
+                                })
+                                .addDisplacementMarker(()->{
+                                    //enhancedDriver.turnGrabber(2);
+                                })
+                                .waitSeconds(1)
+                                .splineToConstantHeading(new Vector2d(12, -18), Math.toRadians(90))
+                                .splineToSplineHeading(new Pose2d(12, -12, Math.toRadians(270)), Math.toRadians(0))
+                                //.lineTo(calculateTargetPositions(StartTile.F5, parkPosition).vec())
                                 .build()
                 );
 
