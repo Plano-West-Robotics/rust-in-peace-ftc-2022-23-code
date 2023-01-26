@@ -25,7 +25,8 @@ public class F5Autonomous extends EnhancedAutoMode {
             new ActionObjectOld(12,-36, 90, 0 ),
             new ActionObjectOld(12,-36, 180, 0 ),
             new ActionObjectOld(12, -26, 180, 13), //moves arm up
-            new ActionObjectOld(5, -26, 180, 12), //moves arm down after moving in
+            new ActionObjectOld(5, -26, 180, 33),
+            //new ActionObjectOld(5, -26, 180, 12), //moves arm down after moving in
             new ActionObjectOld(5, -26, 180, 21), //lets go of cone
             new ActionObjectOld(13, -26, 180, 0), //decouples from junction, lets the parking calc itself
             new ActionObjectOld(14, -13, 180, 0)

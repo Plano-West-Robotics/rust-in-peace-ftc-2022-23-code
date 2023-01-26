@@ -10,9 +10,9 @@ import org.firstinspires.ftc.teamcode.driveobjs.ActionObjectOld;
 import org.firstinspires.ftc.teamcode.driveobjs.aprilTag.AprilTagDetector;
 
 
-@Autonomous (group = "Full Parking")
+@Autonomous (group = "Dev")
 @Config
-public class A5Autonomous extends EnhancedAutoMode {
+public class A5Dev extends EnhancedAutoMode {
     FtcDashboard dashboard = FtcDashboard.getInstance();
     Telemetry dashboardTelemetry = dashboard.getTelemetry();
     public static Pose2d startingPos = new Pose2d(38, 63, Math.toRadians(270));
@@ -23,14 +23,18 @@ public class A5Autonomous extends EnhancedAutoMode {
             */
             new ActionObjectOld(36, 60, 270, 0),
             new ActionObjectOld(12, 60, 270, 0),
-            new ActionObjectOld(12,36, 270, 0 ),
-            new ActionObjectOld(12,36, 180, 0 ),
-            new ActionObjectOld(12, 24, 180, 13),
-            new ActionObjectOld(5, 24, 180, 33),
-            //new ActionObjectOld(5, 24.5, 180, 12),
-            new ActionObjectOld(5, 24, 180, 21),
-            new ActionObjectOld(14, 24, 180, 0),
-            new ActionObjectOld(14, 13, 180, 0),
+            new ActionObjectOld(12,12, 270, 0 ),
+            new ActionObjectOld(24.5,12, 270, 13),
+            new ActionObjectOld(24.5,7, 270, 12),
+            new ActionObjectOld(24.5,7, 270, 21),
+            new ActionObjectOld(24.5,12, 270, 14 ),
+            new ActionObjectOld(32,12, 270, 0 ),
+            new ActionObjectOld(40,11, 0, 0 ),
+            new ActionObjectOld(62, 11, 0, 20),
+            new ActionObjectOld(35, 11, 0, 0),
+            new ActionObjectOld(35, 11, 45, 0),
+            new ActionObjectOld(50, 24, 45, 0),
+            new ActionObjectOld(35, 11, 0, 0),
 
             /**
              * this section picks up more cones
@@ -46,7 +50,7 @@ public class A5Autonomous extends EnhancedAutoMode {
             new ActionObject(24, 6, -90, 21),
             new ActionObject(24, 11, -90, 0),
             new ActionObject(62, 11, 0, 14),
-             */
+            */
     };
 
 
