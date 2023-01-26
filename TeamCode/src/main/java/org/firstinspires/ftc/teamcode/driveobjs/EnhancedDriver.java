@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.configs.ArmPosStorage;
 import org.firstinspires.ftc.teamcode.configs.PoseStorage;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
 
 import java.util.List;
 
@@ -54,6 +55,10 @@ public class EnhancedDriver extends SampleMecanumDrive{
         sleep(1000);
         spoolMotor.setPower(0);
     }
+    public void run(TrajectorySequence trajectorySequence){
+        followTrajectorySequence(trajectorySequence);
+    }
+
 
     public void run(List<ActionObjectOld> actionObjects){
         //setPoseEstimate(actionObjects.remove(0).getPose2d());
@@ -191,7 +196,11 @@ public class EnhancedDriver extends SampleMecanumDrive{
 
 
 
-    private void turnGrabber(int subIndex) {
+
+    /**
+     * @param subIndex 0 is close, 1 is open
+     */
+    public void turnGrabber(int subIndex) {
         switch(subIndex){
             case 0:
                 clawDriver.close();
@@ -205,10 +214,19 @@ public class EnhancedDriver extends SampleMecanumDrive{
                 break;
         }
     }
+    public void openGrabber(){
+        clawDriver.open();
+        clawState = clawState.open;
+    }
+    public void closeGrabber(){
+        clawDriver.close();
+        clawState = clawState.close;
+    }
 
 
 
-    private void moveArm(int subIndex) {
+
+    public void moveArm(int subIndex) {
         int currentPos = spoolMotor.getCurrentPosition();
         switch(subIndex){
             case 0:

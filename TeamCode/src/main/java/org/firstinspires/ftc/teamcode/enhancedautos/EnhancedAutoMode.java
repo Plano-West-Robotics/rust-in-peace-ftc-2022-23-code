@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public abstract class EnhancedAutoMode extends LinearOpMode {
-    private EnhancedDriver enhancedDriver;
+    protected EnhancedDriver enhancedDriver;
     private FtcDashboard dashboard = FtcDashboard.getInstance();
     private Telemetry dashboardTelemetry = dashboard.getTelemetry();
     enum StartTile {A5, A2, F2, F5}
@@ -287,7 +287,7 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
         return square;
     }
 
-    private Pose2d calculateTargetPositions(StartTile startTile, int parkPosition) {
+    public Pose2d calculateTargetPositions(StartTile startTile, int parkPosition) {
         Pose2d parkingGoal = null;
         switch(startTile) {
             case A2:
