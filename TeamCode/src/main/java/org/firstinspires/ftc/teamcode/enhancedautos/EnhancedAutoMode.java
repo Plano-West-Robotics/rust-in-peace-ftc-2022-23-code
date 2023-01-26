@@ -44,10 +44,8 @@ public abstract class EnhancedAutoMode extends LinearOpMode {
 
         enhancedDriver.run(actionObjects);
 
-        Pose2d currentPosition = enhancedDriver.getPoseEstimate();
-        double currentX = currentPosition.getX();
-        double currentY = currentPosition.getY();
-        PoseStorage.currentPose = currentPosition;
+
+        PoseStorage.currentPose = actionObjects.get(actionObjects.size()-1).getPose2d();
     }
 
     public void runQueue() {

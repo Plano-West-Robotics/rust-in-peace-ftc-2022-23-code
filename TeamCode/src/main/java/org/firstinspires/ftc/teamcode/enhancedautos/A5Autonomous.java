@@ -25,11 +25,11 @@ public class A5Autonomous extends EnhancedAutoMode {
             new ActionObjectOld(12, 60, 270, 0),
             new ActionObjectOld(12,36, 270, 0 ),
             new ActionObjectOld(12,36, 180, 0 ),
-            new ActionObjectOld(12, 24.5, 180, 13),
-            new ActionObjectOld(5, 24.5, 180, 33),
-            new ActionObjectOld(5, 24.5, 180, 12),
-            new ActionObjectOld(5, 24.5, 180, 21),
-            new ActionObjectOld(14, 24.5, 180, 0),
+            new ActionObjectOld(12, 24, 180, 13),
+            new ActionObjectOld(5, 24, 180, 33),
+            //new ActionObjectOld(5, 24.5, 180, 12),
+            new ActionObjectOld(5, 24, 180, 21),
+            new ActionObjectOld(14, 24, 180, 0),
             new ActionObjectOld(14, 13, 180, 0),
 
             /**
