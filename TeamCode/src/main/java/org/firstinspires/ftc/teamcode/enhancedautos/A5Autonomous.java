@@ -50,7 +50,7 @@ public class A5Autonomous extends EnhancedAutoMode {
     };
 
 
-    private StartTile startTile = StartTile.A5; //startingTile.[tile]
+    private StartTile startTile = EnhancedAutoMode.StartTile.A5; //StartTile.[tile]
     private int parkPosition = 0;
 
     @Override

@@ -25,7 +25,7 @@ public class F5AutonomousSequence extends EnhancedAutoMode {
 
 
 
-    private StartTile startTile = StartTile.F5; //startingTile.[tile]
+    private StartTile startTile = EnhancedAutoMode.StartTile.F5; //StartTile.[tile]
     private int parkPosition = 0;
 
     @Override
@@ -63,7 +63,7 @@ public class F5AutonomousSequence extends EnhancedAutoMode {
                 .waitSeconds(1)
                 .splineToConstantHeading(new Vector2d(12, -18), Math.toRadians(90))
                 .splineToSplineHeading(new Pose2d(12, -12, Math.toRadians(270)), Math.toRadians(0))
-                .lineTo(calculateTargetPositions(StartTile.F5, parkPosition).vec())
+                .lineTo(calculateTargetPositions(EnhancedAutoMode.StartTile.F5, parkPosition).vec())
                 .build();
 
 

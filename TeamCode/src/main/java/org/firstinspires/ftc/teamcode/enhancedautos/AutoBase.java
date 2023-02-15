@@ -24,7 +24,7 @@ public class AutoBase extends EnhancedAutoMode {
     };
 
 
-    private StartTile startTile = null; //startingTile.[tile]
+    private StartTile startTile = null; //StartTile.[tile]
     private int parkPosition = 0;
 
     @Override

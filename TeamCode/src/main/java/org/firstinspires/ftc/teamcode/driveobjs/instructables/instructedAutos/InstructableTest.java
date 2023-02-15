@@ -24,8 +24,6 @@ public class InstructableTest extends InstructableBase {
 
 
 
-
-
         while (opModeIsActive() && !isStopRequested()) {
 
 

@@ -30,7 +30,7 @@ public class F2Autonomous extends EnhancedAutoMode {
     };
 
 
-    private StartTile startTile = StartTile.F2; //startingTile.[tile]
+    private StartTile startTile = EnhancedAutoMode.StartTile.F2; //StartTile.[tile]
     private int parkPosition = 0;
 
     @Override
