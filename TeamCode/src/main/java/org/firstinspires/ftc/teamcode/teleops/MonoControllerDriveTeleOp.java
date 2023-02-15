@@ -4,7 +4,6 @@ import static org.firstinspires.ftc.teamcode.configs.HardwareNames.backLeftMotor
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.backRightMotorName;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.frontLeftMotorName;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.frontRightMotorName;
-import static org.firstinspires.ftc.teamcode.configs.HardwareNames.grabServo1Name;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.spoolMotorName;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -17,8 +16,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.configs.PoseStorage;
-import org.firstinspires.ftc.teamcode.driveobjs.ClawDriver;
-import org.firstinspires.ftc.teamcode.driveobjs.LinearSlideDriver;
+import org.firstinspires.ftc.teamcode.driveobjs.drivers.ClawDriver;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 
 @TeleOp

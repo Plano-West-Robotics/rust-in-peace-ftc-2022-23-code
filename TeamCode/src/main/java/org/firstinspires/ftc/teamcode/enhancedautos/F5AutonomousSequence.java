@@ -7,7 +7,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.driveobjs.EnhancedDriver;
+import org.firstinspires.ftc.teamcode.driveobjs.drivers.EnhancedDriver;
 import org.firstinspires.ftc.teamcode.driveobjs.aprilTag.AprilTagDetector;
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
 

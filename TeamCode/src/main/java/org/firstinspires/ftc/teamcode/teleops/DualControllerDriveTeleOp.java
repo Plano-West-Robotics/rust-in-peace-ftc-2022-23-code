@@ -16,8 +16,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.teamcode.configs.PoseStorage;
-import org.firstinspires.ftc.teamcode.driveobjs.ClawDriver;
-import org.firstinspires.ftc.teamcode.driveobjs.LinearSlideDriver;
+import org.firstinspires.ftc.teamcode.driveobjs.drivers.ClawDriver;
+import org.firstinspires.ftc.teamcode.driveobjs.drivers.LinearSlideDriver;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 
 @TeleOp
@@ -271,7 +271,8 @@ public class DualControllerDriveTeleOp extends OpMode {
      */
     private void moveArmWithPID(int target){
         slideDriver.setTarget(target);
-        int[] slidePIDOutput = slideDriver.run();
+        slideDriver.run();
+        int[] slidePIDOutput = slideDriver.getOutputValues();
         telemetry.addData("Slide Target", slidePIDOutput[0]);
         telemetry.addData("Slide Current", slidePIDOutput[1]);
         telemetry.addData("Slide Error", slidePIDOutput[2]);

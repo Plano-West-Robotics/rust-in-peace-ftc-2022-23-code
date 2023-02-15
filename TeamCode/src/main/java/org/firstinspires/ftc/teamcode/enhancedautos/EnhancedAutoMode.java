@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.configs.PoseStorage;
 import org.firstinspires.ftc.teamcode.driveobjs.ActionObject;
 import org.firstinspires.ftc.teamcode.driveobjs.ActionObjectOld;
 import org.firstinspires.ftc.teamcode.driveobjs.DriverMethodQueue;
-import org.firstinspires.ftc.teamcode.driveobjs.EnhancedDriver;
+import org.firstinspires.ftc.teamcode.driveobjs.drivers.EnhancedDriver;
 import org.firstinspires.ftc.teamcode.driveobjs.aprilTag.AprilTagDetector;
 
 import java.lang.reflect.Method;

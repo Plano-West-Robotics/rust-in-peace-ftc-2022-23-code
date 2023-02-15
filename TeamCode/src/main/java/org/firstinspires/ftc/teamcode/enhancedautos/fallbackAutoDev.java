@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.driveobjs.ClawDriver;
+import org.firstinspires.ftc.teamcode.driveobjs.drivers.ClawDriver;
 import org.firstinspires.ftc.teamcode.driveobjs.aprilTag.AprilTagDetector;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 

@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.driveobjs.LinearSlideDriver;
+import org.firstinspires.ftc.teamcode.driveobjs.drivers.LinearSlideDriver;
 
 @Autonomous
 @Config
@@ -73,7 +73,8 @@ public class LinearSlideTuner extends LinearOpMode {
             }
 
             linearSlideDriver.setTarget(target);
-            int[] slidePIDOutput = linearSlideDriver.run();
+            linearSlideDriver.run();
+            int[] slidePIDOutput = linearSlideDriver.getOutputValues();
             dashboardTelemetry.addData("Slide Target", slidePIDOutput[0]);
             dashboardTelemetry.addData("Slide Current", slidePIDOutput[1]);
             dashboardTelemetry.addData("Slide Error", slidePIDOutput[2]);

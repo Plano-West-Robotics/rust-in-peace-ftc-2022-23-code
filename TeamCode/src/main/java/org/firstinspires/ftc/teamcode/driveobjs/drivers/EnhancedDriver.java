@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.driveobjs;
+package org.firstinspires.ftc.teamcode.driveobjs.drivers;
 
 
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.spoolMotorName;
@@ -14,12 +14,16 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.configs.ArmPosStorage;
 import org.firstinspires.ftc.teamcode.configs.PoseStorage;
+import org.firstinspires.ftc.teamcode.driveobjs.ActionObjectOld;
+import org.firstinspires.ftc.teamcode.driveobjs.instructables.Instructable;
+import org.firstinspires.ftc.teamcode.driveobjs.instructables.Instruction;
+import org.firstinspires.ftc.teamcode.driveobjs.instructables.InstructionExecutable;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
 
 import java.util.List;
 
-public class EnhancedDriver extends SampleMecanumDrive{
+public class EnhancedDriver extends SampleMecanumDrive implements ActionDriver, Instructable {
     private DcMotor frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor;
     private DcMotor spoolMotor;
     private CRServo grabServo;
@@ -50,13 +54,17 @@ public class EnhancedDriver extends SampleMecanumDrive{
     }
     public void moveConeOutOfWay(){
         clawDriver.close();
-        sleep(1000);
+        //sleep(1000); //TODO
         spoolMotor.setPower(1);
-        sleep(1000);
+        //sleep(1000); //TODO
         spoolMotor.setPower(0);
     }
     public void run(TrajectorySequence trajectorySequence){
         followTrajectorySequence(trajectorySequence);
+    }
+
+    public void run(){
+
     }
 
 
@@ -197,12 +205,12 @@ public class EnhancedDriver extends SampleMecanumDrive{
             case 0:
                 clawDriver.close();
                 clawState = ClawState.close;
-                sleep(1000);
+                //sleep(1000); //TODO
                 break;
             case 1:
                 clawDriver.open();
                 clawState = clawState.open;
-                sleep(1000);
+                //sleep(1000); //TODO
                 break;
         }
     }
@@ -272,7 +280,7 @@ public class EnhancedDriver extends SampleMecanumDrive{
         }
 
 
-        while (spoolMotor.isBusy()) {}
+        //while (spoolMotor.isBusy()) {}
         //spoolMotor.setPower(0.01);
 
         spoolMotor.setPower(0);
@@ -288,6 +296,30 @@ public class EnhancedDriver extends SampleMecanumDrive{
         catch (InterruptedException e){
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Creates an instruction that waits on this driver by default
+     * @param triggerTag the tag that this instruction executes after
+     * @param returnTag the tag that is returned when this instruction finishes executing
+     * @param executable the code to execute
+     * @return returns the intruction that has been created
+     */
+    @Override
+    public Instruction makeInstruction(String triggerTag, String returnTag, InstructionExecutable executable) {
+        return new Instruction(triggerTag, returnTag, executable, this);
+    }
+
+
+    /**
+     * Creates an instruction
+     * @param triggerTag the tag that this instruction executes after
+     * @param executable the code to execute
+     * @return
+     */
+    @Override
+    public Instruction makeInstruction(String triggerTag, InstructionExecutable executable){
+        return new Instruction(triggerTag, executable);
     }
 
 
@@ -336,6 +368,8 @@ public class EnhancedDriver extends SampleMecanumDrive{
 
          */
            }
+
+
 
 
 

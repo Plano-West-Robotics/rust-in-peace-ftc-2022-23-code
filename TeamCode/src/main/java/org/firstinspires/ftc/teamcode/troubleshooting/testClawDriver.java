@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.driveobjs.ClawDriver;
+import org.firstinspires.ftc.teamcode.driveobjs.drivers.ClawDriver;
 
 @TeleOp
 public class testClawDriver extends OpMode {
