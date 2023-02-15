@@ -60,7 +60,7 @@ public class DualControllerDriveTeleOp extends OpMode {
     private enum ClawState {open, close}
     private ClawState clawState = ClawState.close;
     private enum DriveState {field, regular}
-    private DriveState driveState = DriveState.regular;
+    private DriveState driveState;
 
 
     @Override
@@ -98,6 +98,7 @@ public class DualControllerDriveTeleOp extends OpMode {
         }
         if (gamepad1.x){
             driveState = DriveState.field;
+            roadrunnerDriver.setPoseEstimate(new Pose2d(0, 0, 0));
         }
 
 
@@ -123,12 +124,9 @@ public class DualControllerDriveTeleOp extends OpMode {
 
         roadrunnerDriver.update();
 
-        currentPose = roadrunnerDriver.getPoseEstimate();
-
-
-        telemetry.addData("x", currentPose.getX());
-        telemetry.addData("y", currentPose.getY());
-        telemetry.addData("heading", currentPose.getHeading());
+        telemetry.addData("x", roadrunnerDriver.getPoseEstimate().getX());
+        telemetry.addData("y", roadrunnerDriver.getPoseEstimate().getY());
+        telemetry.addData("heading", Math.toDegrees(roadrunnerDriver.getPoseEstimate().getHeading()));
 
     }
 
@@ -144,15 +142,15 @@ public class DualControllerDriveTeleOp extends OpMode {
          * deprecated code, exists here for posterity and in case of
          * request for reimplementation
          *
-        //if A is pressed, it will unlock more variable speed control, else will run at constantSpeedMult
-        if (gamepad1.a) {
-            if (!wasPressingA) {
-                lockSpeed = !lockSpeed;
-            }
-            wasPressingA = true;
-        }
-        else wasPressingA = false;
-        */
+         //if A is pressed, it will unlock more variable speed control, else will run at constantSpeedMult
+         if (gamepad1.a) {
+         if (!wasPressingA) {
+         lockSpeed = !lockSpeed;
+         }
+         wasPressingA = true;
+         }
+         else wasPressingA = false;
+         */
 
         //every time the button is pressed, changes the speed multiplier by constantSpeedMultChangeMult
         if (gamepad1.dpad_up) {
@@ -181,34 +179,34 @@ public class DualControllerDriveTeleOp extends OpMode {
         /** currently nonfunctional
          * TODO: FIX
 
-        if (Math.abs(gamepad2.right_stick_y) > 0.1) {
-            target += spoolSpeedMultiplier * gamepad2.right_stick_y;
-        }
-        else {
-            if (gamepad2.a){
-                target = LinearSlideDriver.height1;
-            }
+         if (Math.abs(gamepad2.right_stick_y) > 0.1) {
+         target += spoolSpeedMultiplier * gamepad2.right_stick_y;
+         }
+         else {
+         if (gamepad2.a){
+         target = LinearSlideDriver.height1;
+         }
 
-            if (gamepad2.b){
-                target = LinearSlideDriver.height2;
-            }
+         if (gamepad2.b){
+         target = LinearSlideDriver.height2;
+         }
 
-            if (gamepad2.x){
-                target = LinearSlideDriver.height3;
-            }
+         if (gamepad2.x){
+         target = LinearSlideDriver.height3;
+         }
 
-            if (gamepad2.y){
-                target = LinearSlideDriver.height4;
-            }
+         if (gamepad2.y){
+         target = LinearSlideDriver.height4;
+         }
 
-        }
-        */
+         }
+         */
 
         /** @deprecated
          * using it anyways
          */
         // sets them to gamepad2
-            // **WARNING POWER VARIABLE**
+        // **WARNING POWER VARIABLE**
         spoolPower = gamepad2.left_stick_y;
         //servoSpeed = gamepad2.right_stick_y;
 
@@ -340,9 +338,11 @@ public class DualControllerDriveTeleOp extends OpMode {
          * initializes the roadrunner stuff
          */
         roadrunnerDriver = new SampleMecanumDrive(hardwareMap);
-        currentPose = PoseStorage.currentPose;
-        roadrunnerDriver.setPoseEstimate(currentPose);
-
+        telemetry.addLine(PoseStorage.currentPose.toString());
+        telemetry.update();
+        roadrunnerDriver.setPoseEstimate(PoseStorage.currentPose);
+        roadrunnerDriver.update();
+        driveState = DriveState.field;
 
         /**
          * initializes the claw driver

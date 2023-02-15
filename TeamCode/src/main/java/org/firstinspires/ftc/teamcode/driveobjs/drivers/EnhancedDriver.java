@@ -189,12 +189,20 @@ public class EnhancedDriver extends SampleMecanumDrive implements ActionDriver, 
             case 2:
                 turnGrabber(subIndex);
                 break;
+            case 3:
+                sleep(2000);
+                break;
             default:
                 throw new IndexOutOfBoundsException("METHOD ID DOES NOT EXIST");
         }
 
 
     }
+    private void wait(int subIndex){
+        sleep(subIndex);
+    }
+
+
 
 
     /**

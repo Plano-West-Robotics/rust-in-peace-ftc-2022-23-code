@@ -37,9 +37,9 @@ public class AprilTagDetector {
     // UNITS ARE METERS
     private double tagsize = 0.166;
 
-    private int LEFT = 1;
-    private int MIDDLE = 2;
-    private int RIGHT = 3;
+    private final int  LEFT = 6;
+    private final int MIDDLE =7;
+    private final int RIGHT = 8;
 
     private AprilTagDetection tagOfInterest = null;
 
@@ -85,8 +85,18 @@ public class AprilTagDetector {
                 }
             }
         }
+        switch(pos){
+            case LEFT:
+                return 1;
+            case MIDDLE:
+                return 2;
+            case RIGHT:
+                return 3;
+            default:
+                return 0;
+        }
 
-        return pos;
+        //return pos;
     }
 
     public void endStream() {
