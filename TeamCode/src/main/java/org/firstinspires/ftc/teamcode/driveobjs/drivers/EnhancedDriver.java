@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.configs.ArmPosStorage;
 import org.firstinspires.ftc.teamcode.configs.PoseStorage;
+import org.firstinspires.ftc.teamcode.configs.StartingTiles;
 import org.firstinspires.ftc.teamcode.driveobjs.ActionObjectOld;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.Instructable;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.Instruction;
@@ -63,8 +64,10 @@ public class EnhancedDriver extends SampleMecanumDrive implements ActionDriver, 
         followTrajectorySequence(trajectorySequence);
     }
 
-    public void run(){
 
+    @Override
+    public void run(){
+        StartingTiles.storage = getPoseEstimate();
     }
 
 
@@ -316,6 +319,17 @@ public class EnhancedDriver extends SampleMecanumDrive implements ActionDriver, 
     @Override
     public Instruction makeInstruction(String triggerTag, String returnTag, InstructionExecutable executable) {
         return new Instruction(triggerTag, returnTag, executable, this);
+    }
+
+    /**
+     * quick instruction creator that waits on this driver and follows this trajectory
+     * @param triggerTag the tag that this instruction executes after
+     * @param returnTag the tag that is returned when this instruction finishes executing
+     * @param trajectory the trajectory to follow
+     * @return
+     */
+    public Instruction makeInstruction(String triggerTag, String returnTag, Trajectory trajectory){
+        return new Instruction(triggerTag, returnTag, ()-> this.followTrajectoryAsync(trajectory), this);
     }
 
 

@@ -67,8 +67,8 @@ public class DualControllerDriveTeleOp extends OpMode {
     public void loop() {
         takeControllerInput();
 
-        //drive();
-        roadrunnerDrive();
+        drive();
+        //roadrunnerDrive();
         //moveArmWithPID(target);
         moveArm();
 
@@ -153,7 +153,7 @@ public class DualControllerDriveTeleOp extends OpMode {
          */
 
         //every time the button is pressed, changes the speed multiplier by constantSpeedMultChangeMult
-        if (gamepad1.dpad_up) {
+        if (gamepad1.right_bumper) {
             if (!wasPressingDpadUp) {
                 constantSpeedMult = Math.min(constantSpeedMult+constantSpeedMultChangeMult, 1);
             }
@@ -161,7 +161,7 @@ public class DualControllerDriveTeleOp extends OpMode {
         }
         else wasPressingDpadUp = false;
 
-        if (gamepad1.dpad_down) {
+        if (gamepad1.left_bumper) {
             if (!wasPressingDpadDown) {
                 constantSpeedMult = Math.max(constantSpeedMult-constantSpeedMultChangeMult, 0);
             }

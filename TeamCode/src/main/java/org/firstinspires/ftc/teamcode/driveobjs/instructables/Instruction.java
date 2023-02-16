@@ -2,16 +2,12 @@ package org.firstinspires.ftc.teamcode.driveobjs.instructables;
 
 import org.firstinspires.ftc.teamcode.driveobjs.drivers.ActionDriver;
 
-import java.util.Objects;
-
 public class Instruction {
-    String trigger;
-    ActionDriver driver;
-    String tag;
-    Enum state;
-    Object extra;
-    InstructionExecutable executable;
-    ActionDriver[] actionDrivers;
+    private String trigger;
+    private String tag;
+    private  InstructionExecutable executable;
+    private ActionDriver[] actionDrivers;
+    private boolean hasReturn;
 
     /**
      * Creates an instruction to be interpreted by the InstructionRunner
@@ -24,12 +20,9 @@ public class Instruction {
         this.trigger = trigger;
         this.tag = tag;
         this.executable = executable;
-        this.driver = driver;
-        this.state = state;
         this.actionDrivers = actionDrivers;
-        if(!Objects.isNull(extra)){
-            this.extra = extra;
-        }
+        hasReturn = true;
+
     }
 
     /**
@@ -40,6 +33,7 @@ public class Instruction {
     public Instruction(String trigger, InstructionExecutable executable){
         this.trigger = trigger;
         this.executable = executable;
+        hasReturn = false;
     }
 
     public ActionDriver[] getActionDrivers() {
@@ -54,7 +48,11 @@ public class Instruction {
         return trigger;
     }
 
+    public boolean getHasReturn(){return hasReturn;}
+
     public InstructionExecutable getExecutable(){return executable; }
+
+
 }
 
 

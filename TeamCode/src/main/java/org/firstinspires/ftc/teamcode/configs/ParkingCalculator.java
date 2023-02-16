@@ -106,7 +106,6 @@ public class ParkingCalculator {
 
         }
 
-
         return translatePoseToInstruction(enhancedDriver, newLocations);
     }
 

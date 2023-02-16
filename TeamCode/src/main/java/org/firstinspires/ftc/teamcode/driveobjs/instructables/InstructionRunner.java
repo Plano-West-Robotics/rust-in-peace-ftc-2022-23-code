@@ -1,17 +1,14 @@
 package org.firstinspires.ftc.teamcode.driveobjs.instructables;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.driveobjs.drivers.ActionDriver;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Objects;
 import java.util.Queue;
 
-@Autonomous
 public class InstructionRunner {
     private Pose2d startPose;
     HardwareMap hardwareMap;
@@ -93,7 +90,7 @@ public class InstructionRunner {
      */
     private void executeInstruction(Instruction i) {
         //checks if the Instruction has a return tag
-        if (Objects.isNull(i.getTag())){
+        if (!i.getHasReturn()){
             //if it does not, simply runs the code inside, removes the instruction, and exits
             i.getExecutable().execute();
             needsExecution.remove(i);
@@ -119,13 +116,6 @@ public class InstructionRunner {
                 return false;
         }
         return true;
-    }
-
-    public enum DriveState {
-        IDLE,   //when nothing is happening
-        TRAJECTORY,   //follows the next trajectory in line
-        TURN,   //follows the next turn in line
-
     }
 
 
