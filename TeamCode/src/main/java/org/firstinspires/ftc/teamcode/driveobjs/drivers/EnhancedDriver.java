@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -55,9 +56,12 @@ public class EnhancedDriver extends SampleMecanumDrive implements ActionDriver, 
     }
     public void moveConeOutOfWay(){
         clawDriver.close();
-        //sleep(1000); //TODO
+        for (int i = 0; i < 1000; i++){
+            clawDriver.run();
+            sleep(1);
+        }
         spoolMotor.setPower(1);
-        //sleep(1000); //TODO
+        sleep(500); //TODO
         spoolMotor.setPower(0);
     }
     public void run(TrajectorySequence trajectorySequence){
@@ -291,7 +295,10 @@ public class EnhancedDriver extends SampleMecanumDrive implements ActionDriver, 
         }
 
 
-        //while (spoolMotor.isBusy()) {}
+        while (spoolMotor.isBusy()) {
+            dashboardTelemetry.addData("Encoder Value:", spoolMotor.getCurrentPosition());
+            dashboardTelemetry.update();
+        }
         //spoolMotor.setPower(0.01);
 
         spoolMotor.setPower(0);
@@ -367,6 +374,7 @@ public class EnhancedDriver extends SampleMecanumDrive implements ActionDriver, 
         spoolMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spoolMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         spoolMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         clawDriver = new ClawDriver(hardwareMap);
 
@@ -389,6 +397,9 @@ public class EnhancedDriver extends SampleMecanumDrive implements ActionDriver, 
         armTwo.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
          */
+        clawDriver.setClawState(ClawDriver.ClawState.CLOSED);
+        clawDriver.close();
+        clawState = ClawState.close;
            }
 
 

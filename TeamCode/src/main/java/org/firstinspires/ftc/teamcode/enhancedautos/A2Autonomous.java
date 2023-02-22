@@ -15,18 +15,18 @@ import org.firstinspires.ftc.teamcode.driveobjs.aprilTag.AprilTagDetector;
 public class A2Autonomous extends EnhancedAutoMode {
     FtcDashboard dashboard = FtcDashboard.getInstance();
     Telemetry dashboardTelemetry = dashboard.getTelemetry();
-    public static Pose2d startingPos = new Pose2d(-34, 63, Math.toRadians(-90));
+    public static Pose2d startingPos = new Pose2d(-32, 63, Math.toRadians(-90));
 
     public static ActionObjectOld[] actionObjectList = {
             new ActionObjectOld(-36, 60, -90, 0),
             new ActionObjectOld(-12, 60, -90, 0),
             new ActionObjectOld(-12,36, -90, 0 ),
             new ActionObjectOld(-12,36, 0, 0 ),
-            new ActionObjectOld(-12, 26, 0, 13),
-            new ActionObjectOld(-4.5, 26, 0, 33),
+            new ActionObjectOld(-12, 25.5, 0, 13),
+            new ActionObjectOld(-9, 25.5, 0, 33),
             //new ActionObjectOld(-4.5, 26, 0, 12),
-            new ActionObjectOld(-4.5, 26, 0, 21),
-            new ActionObjectOld(-13, 25, 0, 0),
+            new ActionObjectOld(-9, 25.5, 0, 21),
+            new ActionObjectOld(-12, 25.5, 0, 0),
             new ActionObjectOld(-13, 13, 0, 0)
     };
 

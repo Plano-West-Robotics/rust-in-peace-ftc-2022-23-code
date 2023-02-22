@@ -321,7 +321,7 @@ public class DualControllerDriveTeleOp extends OpMode {
          */
         spoolMotor = hardwareMap.get(DcMotor.class, spoolMotorName);
         spoolMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        spoolMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         spoolMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spoolMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 

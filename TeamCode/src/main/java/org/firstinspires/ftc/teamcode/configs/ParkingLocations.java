@@ -8,7 +8,7 @@ public class ParkingLocations {
     public static Pose2d F2Point1 = new Pose2d(-60, -13, Math.toRadians(-90));
     //public static Pose2d F2Point2 = new Pose2d(-45, -27);
 
-    public static Pose2d F5Point1 = new Pose2d(12, -13, Math.toRadians(90));
+    public static Pose2d F5Point1 = new Pose2d(11, -13, Math.toRadians(90));
     //public static Pose2d F5Point2 = new Pose2d(9, -27);
 
     public static Pose2d A2Point1 = new Pose2d(-60, 13, Math.toRadians(-90));

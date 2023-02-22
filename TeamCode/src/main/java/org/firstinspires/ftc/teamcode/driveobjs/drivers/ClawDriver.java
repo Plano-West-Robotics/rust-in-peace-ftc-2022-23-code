@@ -74,6 +74,8 @@ public class ClawDriver implements ActionDriver, Instructable {
 
         clawServo2 = hardwareMap.get(Servo.class, grabServo2Name);
         //clawServo2.scaleRange(claw2Min, claw2Max);
+
+        clawState = ClawState.CLOSED;
     }
 
     public void setClawState(ClawState state) {
