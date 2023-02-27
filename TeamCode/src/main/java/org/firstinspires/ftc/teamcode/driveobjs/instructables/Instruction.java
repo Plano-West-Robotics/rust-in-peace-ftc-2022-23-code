@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.driveobjs.instructables;
 import org.firstinspires.ftc.teamcode.driveobjs.drivers.ActionDriver;
 
 public class Instruction {
-    private String trigger;
+    private String[] triggers;
     private String tag;
     private  InstructionExecutable executable;
     private ActionDriver[] actionDrivers;
@@ -11,13 +11,13 @@ public class Instruction {
 
     /**
      * Creates an instruction to be interpreted by the InstructionRunner
-     * @param trigger the tag that this instruction executes after
+     * @param triggers the tags that this instruction executes after
      * @param tag the tag that is returned when this instruction finishes executing
      * @param executable the code to execute
-     * @param actionDrivers tells the instruction WHICH ACTION DRIVERS TO WAIT TO FINISH BEFORE SENDING THE NEXT CODE (VERY IMPORTANT)
+     * @param actionDriver tells the instruction which ActionDriver to wait on
      */
-    public Instruction(String trigger, String tag, InstructionExecutable executable, ActionDriver... actionDrivers){
-        this.trigger = trigger;
+    public Instruction(String tag, InstructionExecutable executable, ActionDriver actionDriver, String... triggers){
+        this.triggers = triggers;
         this.tag = tag;
         this.executable = executable;
         this.actionDrivers = actionDrivers;
@@ -25,13 +25,15 @@ public class Instruction {
 
     }
 
+
+
     /**
      * Creates an instruction WITHOUT A RETURN TAG, there will be no informing when this instruction finishes executing
-     * @param trigger the tag that this instruction executes after
+     * @param triggers the tag that this instruction executes after
      * @param executable the code to execute
      */
-    public Instruction(String trigger, InstructionExecutable executable){
-        this.trigger = trigger;
+    public Instruction(InstructionExecutable executable, String... triggers){
+        this.triggers = triggers;
         this.executable = executable;
         hasReturn = false;
     }
@@ -44,15 +46,22 @@ public class Instruction {
         return tag;
     }
 
-    public String getTrigger() {
-        return trigger;
+    public String[] getTriggers() {
+        return triggers;
     }
 
     public boolean getHasReturn(){return hasReturn;}
 
     public InstructionExecutable getExecutable(){return executable; }
 
-
+    @Override
+    public String toString() {
+        return "Instruction{" +
+                "triggers='" + triggers.toString() + '\'' +
+                ", tag='" + tag + '\'' +
+                ", hasReturn=" + hasReturn +
+                '}';
+    }
 }
 
 

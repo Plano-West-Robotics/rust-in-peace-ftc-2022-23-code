@@ -19,8 +19,15 @@ import java.util.List;
 public class ParkingCalculator {
     public static String parkingTrigger = "BEGIN_PARKING_SEQUENCE";
 
-    public static ArrayList<Instruction> calculateParking(StartTile startTile, Pose2d lastPose, int parkPosition, EnhancedDriver enhancedDriver){
+    public static ArrayList<Instruction> calculateParking(String triggerTag, StartTile startTile, Pose2d lastPose, int parkPosition, EnhancedDriver enhancedDriver){
+        /**
+         * does a quick check to see that there is actually a thing to process here
+         */
+        if (parkPosition == 0)
+            return null;
+
         ArrayList<Pose2d> newLocations = new ArrayList<>(0);
+        parkingTrigger = triggerTag;
 
         double lastX = lastPose.getX();
         double lastY = lastPose.getY();
@@ -107,6 +114,9 @@ public class ParkingCalculator {
         }
 
         return translatePoseToInstruction(enhancedDriver, newLocations);
+
+        //Instruction[] instructions = {new Instruction()}
+        //return
     }
 
     /**
@@ -119,9 +129,10 @@ public class ParkingCalculator {
         ArrayList<Instruction> instructions = new ArrayList<Instruction>();
         for (int i = 0; i < newLocations.size(); i++) {
             int finalI = i;
-            instructions.add(driver.makeInstruction(parkingTrigger, parkingTrigger, () ->
+            instructions.add(driver.makeInstruction(parkingTrigger, parkingTrigger+i, () ->
                     driver.driveTo(newLocations.get(finalI)))
             );
+            parkingTrigger = parkingTrigger+i;
         }
         return instructions;
     }

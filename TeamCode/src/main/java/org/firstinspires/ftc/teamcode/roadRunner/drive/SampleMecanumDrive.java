@@ -58,7 +58,7 @@ import java.util.List;
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(8, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(4, 0, 0);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(8, 0, 0);
 
     public static double LATERAL_MULTIPLIER = 1.1632915940;
@@ -295,7 +295,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
-        double multiplier = 1;//12.5 / batteryVoltageSensor.getVoltage();
+        double multiplier = 12.5 / batteryVoltageSensor.getVoltage();
         leftFront.setPower(multiplier * v);
         leftRear.setPower(multiplier * v1);
         rightRear.setPower(multiplier * v2);

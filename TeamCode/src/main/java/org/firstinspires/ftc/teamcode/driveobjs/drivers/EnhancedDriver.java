@@ -72,6 +72,7 @@ public class EnhancedDriver extends SampleMecanumDrive implements ActionDriver, 
     @Override
     public void run(){
         StartingTiles.storage = getPoseEstimate();
+        update();
     }
 
 
@@ -245,16 +246,16 @@ public class EnhancedDriver extends SampleMecanumDrive implements ActionDriver, 
         int currentPos = spoolMotor.getCurrentPosition();
         switch(subIndex){
             case 0:
-                spoolMotor.setTargetPosition(ArmPosStorage.ArmPos0);
+                spoolMotor.setTargetPosition(ArmPosStorage.ARM_POS_0);
                 break;
             case 1:
-                spoolMotor.setTargetPosition(ArmPosStorage.ArmPos1);
+                spoolMotor.setTargetPosition(ArmPosStorage.ARM_POS_1);
                 break;
             case 2:
-                spoolMotor.setTargetPosition(ArmPosStorage.ArmPos2);
+                spoolMotor.setTargetPosition(ArmPosStorage.ARM_POS_2);
                 break;
             case 3:
-                spoolMotor.setTargetPosition(ArmPosStorage.ArmPos3);
+                spoolMotor.setTargetPosition(ArmPosStorage.ARM_POS_3);
                 break;
             case 4:
                 spoolMotor.setTargetPosition(ArmPosStorage.stackArmPoses[stackIndex]);
@@ -288,10 +289,10 @@ public class EnhancedDriver extends SampleMecanumDrive implements ActionDriver, 
 
         }
         if (spoolMotor.getTargetPosition() > spoolMotor.getCurrentPosition()){
-            spoolMotor.setPower(1);
+            spoolMotor.setPower(-1);
         }
         else{
-            spoolMotor.setPower(-1);
+            spoolMotor.setPower(1);
         }
 
 
@@ -329,6 +330,7 @@ public class EnhancedDriver extends SampleMecanumDrive implements ActionDriver, 
     }
 
     /**
+     * @deprecated PLEASE DO NOT USE THIS FOR ACTUAL ASYNC PATH FOLLOWING
      * quick instruction creator that waits on this driver and follows this trajectory
      * @param triggerTag the tag that this instruction executes after
      * @param returnTag the tag that is returned when this instruction finishes executing
@@ -341,6 +343,7 @@ public class EnhancedDriver extends SampleMecanumDrive implements ActionDriver, 
 
 
     /**
+     * @deprecated PLEASE DO NOT USE THIS FOR ACTUAL ASYNC PATH FOLLOWING
      * Creates an instruction
      * @param triggerTag the tag that this instruction executes after
      * @param executable the code to execute
@@ -349,6 +352,53 @@ public class EnhancedDriver extends SampleMecanumDrive implements ActionDriver, 
     @Override
     public Instruction makeInstruction(String triggerTag, InstructionExecutable executable){
         return new Instruction(triggerTag, executable);
+    }
+
+    /**
+     * USE THIS FOR PATH FOLLOWING
+     * This is an incredibly shitty solution to prevent it from spamming enhanced driver with instructions
+     * @param triggerTag
+     * @param returnTag
+     * @param trajectory
+     * @return
+     */
+    public Instruction[] asyncPathFollowInstruction(String triggerTag, String returnTag, Trajectory trajectory){
+        Instruction[] instructions = {
+                new Instruction(triggerTag, () -> this.followTrajectoryAsync(trajectory)),
+                new Instruction(triggerTag, returnTag, ()->{}, this)
+        };
+        return instructions;
+    }
+    /**
+     * USE THIS FOR PATH FOLLOWING
+     * This is an incredibly shitty solution to prevent it from spamming enhanced driver with instructions
+     * @param triggerTag
+     * @param returnTag
+     * @param trajectory
+     * @return
+     */
+    public Instruction[] asyncPathFollowInstruction(String triggerTag, String returnTag, TrajectorySequence trajectory){
+        Instruction[] instructions = {
+                new Instruction(triggerTag, () -> this.followTrajectorySequenceAsync(trajectory)),
+                new Instruction(triggerTag, returnTag, ()->{}, this)
+        };
+        return instructions;
+    }
+
+    /**
+     * USE THIS
+     * This is an incredibly shitty solution to prevent it from spamming enhanced driver with instructions
+     * @param triggerTag
+     * @param returnTag
+     * @param executable the lambda expression to execute
+     * @return
+     */
+    public Instruction[] makeAsyncInstruction(String triggerTag, String returnTag, InstructionExecutable executable){
+        Instruction[] instructions = {
+                new Instruction(triggerTag, executable),
+                new Instruction(triggerTag, returnTag, ()->{}, this)
+        };
+        return instructions;
     }
 
 
@@ -374,7 +424,7 @@ public class EnhancedDriver extends SampleMecanumDrive implements ActionDriver, 
         spoolMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spoolMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         spoolMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        spoolMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         clawDriver = new ClawDriver(hardwareMap);
 

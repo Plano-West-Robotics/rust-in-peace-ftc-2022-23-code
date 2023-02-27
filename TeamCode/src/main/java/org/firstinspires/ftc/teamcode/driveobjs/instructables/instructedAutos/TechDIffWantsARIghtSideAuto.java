@@ -25,7 +25,7 @@ import org.firstinspires.ftc.teamcode.driveobjs.instructables.InstructionRunner;
 import java.util.ArrayList;
 
 @Autonomous
-public class InstructableA2 extends InstructableBase{
+public class TechDIffWantsARIghtSideAuto extends InstructableBase{
     InstructionRunner runner;
     ClawDriver claw;
     EnhancedDriver driver;
@@ -50,17 +50,19 @@ public class InstructableA2 extends InstructableBase{
                 .splineToConstantHeading(new Vector2d(-24, 61), Math.toRadians(0), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
                 .lineToConstantHeading(new Vector2d(-18, 61), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
                 .splineToConstantHeading(new Vector2d(-12, 55), Math.toRadians(-90), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
-                .lineToSplineHeading(new Pose2d(-12, 30, Math.toRadians(0)), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
-                .splineToConstantHeading(new Vector2d(-10, 26.5), Math.toRadians(0), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
+                .lineToConstantHeading(new Vector2d(-12, 24), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
+                .splineToConstantHeading(new Vector2d(-24, 12), Math.toRadians(180), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
+                //.lineToConstantHeading(new Vector2d(-30, 12), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
+                .splineToConstantHeading(new Vector2d(-26, 10), Math.toRadians(-90), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
                 .build();
 
 
         runner.addInstruction(driver.asyncPathFollowInstruction("START", "TRAJ1", traj1));
 
         runner.addInstruction(claw.closeInstruction("START"));
-        runner.addInstruction(TimerDriver.waitInstruction("START", "STARTSLIDE1", 2000));
 
-        runner.addInstruction(slide.makeInstruction("STARTSLIDE1", "SLIDE1", () -> {slide.setTargetHigh();}));
+        runner.addInstruction(TimerDriver.waitInstruction("START", "STARTSLIDE", 4000));
+        runner.addInstruction(slide.makeInstruction("STARTSLIDE", "SLIDE1", () -> {slide.setTargetHigh();}));
 
         runner.addInstruction(TimerDriver.waitInstruction("SLIDE1", "FALLWAIT", 2000));
         runner.addInstruction(claw.openInstruction("FALLWAIT"));
@@ -70,8 +72,7 @@ public class InstructableA2 extends InstructableBase{
          * goes to park calc
          */
         Trajectory traj2 = driver.trajectoryBuilder(traj1.end())
-                .splineToConstantHeading(new Vector2d(-12, 21), Math.toRadians(-90))
-                .lineToConstantHeading(new Vector2d(-12, 12))
+                .splineToConstantHeading(new Vector2d(-24, 12), Math.toRadians(-90))
                 .build();
         runner.addInstruction(driver.asyncPathFollowInstruction("FINISHOPEN", "START_PARKING_SEQUENCE", traj2));
 

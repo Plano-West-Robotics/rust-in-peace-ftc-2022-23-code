@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.driveobjs.instructables;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.driveobjs.drivers.ActionDriver;
 
 import java.util.ArrayList;
@@ -11,8 +12,9 @@ import java.util.Queue;
 
 public class InstructionRunner {
     private Pose2d startPose;
-    HardwareMap hardwareMap;
     ActionDriver[] actionDrivers;
+    Queue<String> tags = new LinkedList<String>();
+    Telemetry telemetry;
 
     //stores the instructions
     ArrayList<Instruction> instructions = new ArrayList<Instruction>();
@@ -24,14 +26,13 @@ public class InstructionRunner {
 
     /**
      * Creates the instruction runner
-     * @param hardwareMap must provide hardwareMap
      * @param startPose give the initial Pose2d
      * @param initialTag set the first tag to run
-     * @param actionDrivers gives the list of drivers to run asyncrhonously
+     * @param actionDrivers gives the list of drivers to run asynchronously
      */
-    public InstructionRunner(HardwareMap hardwareMap, Pose2d startPose, String initialTag, ActionDriver... actionDrivers) {
+    public InstructionRunner(HardwareMap hardwareMap, Pose2d startPose, String initialTag, Telemetry telemetry, ActionDriver... actionDrivers) {
+        this.telemetry = telemetry;
         this.startPose = startPose;
-        this.hardwareMap = hardwareMap;
         tags.add(initialTag);
         this.actionDrivers = actionDrivers;
     }
@@ -40,40 +41,51 @@ public class InstructionRunner {
     /**
      * creates and adds and instruction
      * not recommended for use, use the drivers' specific makeInstructions instead
-     * @param triggerTag the tag that this instruction executes after
+     * @param triggerTags the tag(s) that this instruction executes after
      * @param returnTag the tag that is returned when this instruction finishes executing
      * @param executable the code to execute
      */
-    public void addInstruction(String triggerTag, String returnTag, InstructionExecutable executable, ActionDriver... actionDrivers) {
-        instructions.add(new Instruction(triggerTag, returnTag, executable, actionDrivers));
+    public void addInstruction(String returnTag, InstructionExecutable executable, ActionDriver actionDriver, String... triggerTags) {
+        instructions.add(new Instruction(returnTag, executable, actionDriver, triggerTags);
     }
 
     /**
      * adds the instruction to the list
      * preferred over the other variant
-     * @param instruction the instruction to be added
+     * @param instructions the instruction to be added
      */
-    public void addInstruction(Instruction instruction){
-        instructions.add(instruction);
+    public void addInstruction(Instruction... instructions){
+        for(Instruction i : instructions)
+            this.instructions.add(i);
     }
 
-    Queue<String> tags = new LinkedList<String>();
+
+
 
     /**
      * primary execution loop for InstructionRunner
      * this is intended to be looped to follow the list of instructions
      */
-    public void run() {
+    public String run() {
+        //creates a shallow copy of needsExecution to loop through
+        ArrayList<Instruction> executionCopy = (ArrayList<Instruction>) needsExecution.clone();
+
+        for (Instruction i : executionCopy) {
+            pruneInstruction(i);
+        }
+
+
         //runs find instructions on every tag in tags
-        for (int i = 0; i < tags.size(); i++){
+        while (!tags.isEmpty()){
             findInstructions(tags.poll());
         }
 
-        //creates a shallow copy of needsExecution to loop through
-        ArrayList<Instruction> executionCopy = new ArrayList<Instruction>(needsExecution);
+        telemetry.addData("Found Instructions", needsExecution.toString());
+
+
 
         //executes those tags
-        for (Instruction i : executionCopy) {
+        for (Instruction i : needsExecution) {
             executeInstruction(i);
         }
 
@@ -82,17 +94,26 @@ public class InstructionRunner {
             driver.run();
         }
 
+        return tags.toString();
     }
 
     /**
-     * executes the instruction given, and removes it if it is a one time execution, or if it is completed
+     * executes the instruction given
      * @param i the instruction to be run against
      */
     private void executeInstruction(Instruction i) {
+        //runs the code
+        i.getExecutable().execute();
+    }
+
+    /**
+     * removes the instruction if it is a one time execution, or if it is completed
+     * @param i te instruction to be run against
+     */
+    private void pruneInstruction(Instruction i){
         //checks if the Instruction has a return tag
         if (!i.getHasReturn()){
-            //if it does not, simply runs the code inside, removes the instruction, and exits
-            i.getExecutable().execute();
+            //if it does not, removes the instruction, and exits
             needsExecution.remove(i);
             return;
         }
@@ -104,12 +125,13 @@ public class InstructionRunner {
             tags.add(i.getTag());
             return;
         }
-
-        //if all of those checks are false, runs the code
-        i.getExecutable().execute();
-
     }
 
+    /**
+     * checks if all of the actionDrivers passed to it are no longer busy
+     * @param actionDrivers
+     * @return
+     */
     private boolean checkCompletion(ActionDriver[] actionDrivers){
         for(ActionDriver driver : actionDrivers){
             if (driver.isBusy())
@@ -125,10 +147,14 @@ public class InstructionRunner {
      */
     private void findInstructions(String tag) {
         for (Instruction instruction : instructions) {
-            if (instruction.getTrigger().equals(tag)) {
+            if (instruction.getTrigger().equalsIgnoreCase(tag)) {
                 needsExecution.add(instruction);
             }
         }
+    }
+
+    public String getTags(){
+        return tags.toString();
     }
 }
 

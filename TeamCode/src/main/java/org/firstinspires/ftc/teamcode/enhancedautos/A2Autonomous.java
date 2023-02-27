@@ -27,7 +27,16 @@ public class A2Autonomous extends EnhancedAutoMode {
             //new ActionObjectOld(-4.5, 26, 0, 12),
             new ActionObjectOld(-9, 25.5, 0, 21),
             new ActionObjectOld(-12, 25.5, 0, 0),
-            new ActionObjectOld(-13, 13, 0, 0)
+            new ActionObjectOld(-13, 13, 0, 0),
+            /*
+            new ActionObjectOld(-13, 13, -180, 14),
+            new ActionObjectOld(-63, 13, -180, 14),
+            new ActionObjectOld(-36, 13, -180),
+            new ActionObjectOld(-36, 13, -90, 13),
+            new ActionObjectOld(-36, 10, -90, 33),
+            new ActionObjectOld(-36, 10, -90, 21),
+            new ActionObjectOld(-36, 13, -90)
+            */
     };
 
 
@@ -44,7 +53,7 @@ public class A2Autonomous extends EnhancedAutoMode {
             telemetry.update();
             sleep(50);
         }
-
+        detector.endStream();
         initThings(startingPos, startTile, actionObjectList, parkPosition);
 
         run();

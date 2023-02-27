@@ -12,11 +12,10 @@ import org.firstinspires.ftc.teamcode.driveobjs.instructables.Instruction;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.InstructionExecutable;
 
 @Config
-
 public class ClawDriver implements ActionDriver, Instructable {
     public static double claw1Min = 0;
     public static double claw1Max = 0.6;
-    public static double claw2Min = 0.30;
+    public static double claw2Min = 0.40;
     public static double claw2Max = 0.55;
 
 
@@ -45,14 +44,15 @@ public class ClawDriver implements ActionDriver, Instructable {
     }
 
     public void open() {
-        clawServo1.setPosition(claw1Min);
-        clawServo2.setPosition(claw2Max);
+        clawServo1.setPosition(claw1Max);
+        clawServo2.setPosition(claw2Min);
         clawState = ClawState.OPEN;
     }
 
     public void close() {
-        clawServo1.setPosition(claw1Max);
-        clawServo2.setPosition(claw2Min);
+        clawServo1.setPosition(claw1Min);
+        clawServo2.setPosition(claw2Max);
+
         clawState = ClawState.CLOSED;
     }
 
@@ -93,6 +93,24 @@ public class ClawDriver implements ActionDriver, Instructable {
     @Override
     public Instruction makeInstruction(String triggerTag, String returnTag, InstructionExecutable executable) {
         return new Instruction(triggerTag, returnTag, executable, this);
+    }
+
+    /**
+     * makes a quick no wait instruction to close
+     * @param triggerTag the tag to trigger on
+     * @return the instruction made
+     */
+    public Instruction closeInstruction(String triggerTag){
+        return new Instruction(triggerTag, () -> this.close());
+    }
+
+    /**
+     * makes a quick no wait instruction to open
+     * @param triggerTag the tag to trigger on
+     * @return the instruction made
+     */
+    public Instruction openInstruction(String triggerTag){
+        return new Instruction(triggerTag, () -> this.open());
     }
 
 

@@ -1,10 +1,15 @@
 package org.firstinspires.ftc.teamcode.driveobjs.drivers;
 
+import static org.firstinspires.ftc.teamcode.configs.ArmPosStorage.ARM_POS_0;
+import static org.firstinspires.ftc.teamcode.configs.ArmPosStorage.ARM_POS_1;
+import static org.firstinspires.ftc.teamcode.configs.ArmPosStorage.ARM_POS_2;
+import static org.firstinspires.ftc.teamcode.configs.ArmPosStorage.ARM_POS_3;
 import static org.firstinspires.ftc.teamcode.configs.HardwareNames.spoolMotorName;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.Instructable;
@@ -13,7 +18,6 @@ import org.firstinspires.ftc.teamcode.driveobjs.instructables.InstructionExecuta
 
 @Config
 public class LinearSlideDriver implements ActionDriver, Instructable {
-
     private DcMotorEx spoolMotor;
     private HardwareMap hardwareMap;
 
@@ -27,11 +31,8 @@ public class LinearSlideDriver implements ActionDriver, Instructable {
     private long lastTime = 0;
     private double pidOutput = 0;
 
-    //TODO: tune these values
-    public static int height1 = 0;
-    public static int height2 = 100;
-    public static int height3 = 200;
-    public static int height4 = 300;
+    private boolean hasChanged = false;
+    private boolean isPositive = false;
 
 
     public LinearSlideDriver(HardwareMap hardwareMap){
@@ -56,34 +57,33 @@ public class LinearSlideDriver implements ActionDriver, Instructable {
         previous_error = error;
 
 
-
-
     }
 
     public void init() {
         spoolMotor = hardwareMap.get(DcMotorEx.class, spoolMotorName);
         spoolMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spoolMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spoolMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         long lastTime = System.currentTimeMillis();
+        targetEncoderValue = spoolMotor.getCurrentPosition();
         //spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
-    public void setTargetHeight1(){
-        targetEncoderValue = height1;
+    public void setTargetGround(){
+        setTargetPosition(ARM_POS_0);
     }
 
-    public void setTargetHeight2(){
-        targetEncoderValue = height2;
+    public void setTargetLow(){
+        setTargetPosition(ARM_POS_1);
     }
 
-    public void setTargetHeight3(){
-        targetEncoderValue = height3;
+    public void setTargetMid(){
+        setTargetPosition(ARM_POS_2);
     }
 
-    public void setTargetHeight4(){
-        targetEncoderValue = height4;
+    public void setTargetHigh(){
+        setTargetPosition(ARM_POS_3);
     }
     /**
      *
@@ -110,28 +110,41 @@ public class LinearSlideDriver implements ActionDriver, Instructable {
         //remembers the encoder value just in case
         targetEncoderValue = encoderValue;
         spoolMotor.setTargetPosition(targetEncoderValue);
+        if (targetEncoderValue > spoolMotor.getCurrentPosition()) {
+            isPositive = true;
+        } else if (targetEncoderValue < spoolMotor.getCurrentPosition()) {
+            isPositive = false;
+        }
+        hasChanged = true;
     }
 
 
     public void run(){
-        spoolMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        if (hasChanged) {
+            if (spoolMotor.getTargetPosition() == spoolMotor.getCurrentPosition()) {
+                spoolMotor.setPower(0);
+                hasChanged = false;
+                return;
+            }
+
+            if (isPositive && spoolMotor.getTargetPosition() > spoolMotor.getCurrentPosition()) {
+                spoolMotor.setPower(-1);
+            } else if (spoolMotor.getTargetPosition() < spoolMotor.getCurrentPosition()) {
+                spoolMotor.setPower(1);
+            }
 
 
-        if (spoolMotor.getTargetPosition() == spoolMotor.getCurrentPosition()){
-            spoolMotor.setPower(0);
+            if (isPositive && spoolMotor.getTargetPosition() < spoolMotor.getCurrentPosition()) {
+                spoolMotor.setPower(0);
+                hasChanged = false;
+            } else if (!isPositive && spoolMotor.getTargetPosition() > spoolMotor.getCurrentPosition()) {
+                spoolMotor.setPower(0);
+                hasChanged = false;
+            }
+
             return;
         }
-
-
-        if (spoolMotor.getTargetPosition() > spoolMotor.getCurrentPosition()){
-            spoolMotor.setPower(1);
-        }
-        else if (spoolMotor.getTargetPosition() < spoolMotor.getCurrentPosition()){
-            spoolMotor.setPower(-1);
-        }
-
-
-
+        spoolMotor.setPower(0);
     }
 
     public int[] getOutputValues(){

@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.configs.ArmPosStorage;
 import org.firstinspires.ftc.teamcode.driveobjs.drivers.LinearSlideDriver;
 
 @Autonomous
@@ -49,19 +50,19 @@ public class LinearSlideTuner extends LinearOpMode {
 
 
                 if (gamepad1.a) {
-                    target = LinearSlideDriver.height1;
+                    target = ArmPosStorage.ARM_POS_0;
                 }
 
                 if (gamepad1.b) {
-                    target = LinearSlideDriver.height2;
+                    target = ArmPosStorage.ARM_POS_1;
                 }
 
                 if (gamepad1.x) {
-                    target = LinearSlideDriver.height3;
+                    target = ArmPosStorage.ARM_POS_2;
                 }
 
                 if (gamepad1.y) {
-                    target = LinearSlideDriver.height4;
+                    target = ArmPosStorage.ARM_POS_3;
                 }
 
 
