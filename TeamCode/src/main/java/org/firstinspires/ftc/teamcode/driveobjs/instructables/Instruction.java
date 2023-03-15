@@ -1,41 +1,90 @@
 package org.firstinspires.ftc.teamcode.driveobjs.instructables;
 
-import org.firstinspires.ftc.teamcode.driveobjs.drivers.ActionDriver;
+import java.util.Arrays;
+import java.util.Objects;
 
-public class Instruction {
-    private String[] triggers;
-    private String tag;
-    private  InstructionExecutable executable;
-    private ActionDriver[] actionDrivers;
-    private boolean hasReturn;
+public abstract class Instruction {
 
     /**
-     * Creates an instruction to be interpreted by the InstructionRunner
-     * @param triggers the tags that this instruction executes after
-     * @param tag the tag that is returned when this instruction finishes executing
-     * @param executable the code to execute
-     * @param actionDriver tells the instruction which ActionDriver to wait on
+     * these default behaviors should let contains() and containsAll() work properly
      */
-    public Instruction(String tag, InstructionExecutable executable, ActionDriver actionDriver, String... triggers){
-        this.triggers = triggers;
-        this.tag = tag;
-        this.executable = executable;
-        this.actionDrivers = actionDrivers;
-        hasReturn = true;
+    protected String[] triggers = {};
+    protected String tag;
+    protected InstructionExecutable executable;
+    protected ActionDriver[] actionDrivers = {};
+
+
+
+    /**
+     * Quick helper function
+     * @param elements array
+     * @param element element
+     * @param <T> type
+     * @return
+     */
+    static <T> T[] add2BeginningOfArray(T[] elements, T element)
+    {
+        T[] newArray = Arrays.copyOf(elements, elements.length + 1);
+        newArray[0] = element;
+        System.arraycopy(elements, 0, newArray, 1, elements.length);
+
+        return newArray;
+    }
+
+
+    /**
+     * default constructor
+     * does nothing
+     */
+    public Instruction(){
 
     }
 
 
 
     /**
+     * @deprecated old artefacts
+     * Creates an instruction to be interpreted by the InstructionRunner
+     * @param trigger the tag that this instruction executes after
+     * @param triggers the extra tags to wait on
+     * @param tag the tag that is returned when this instruction finishes executing
+     * @param executable the code to execute
+     * @param actionDriver tells the instruction which ActionDriver to wait on
+     */
+    public Instruction(String trigger, String tag, InstructionExecutable executable, ActionDriver actionDriver, String... triggers){
+        this.triggers = add2BeginningOfArray(triggers, trigger);
+        this.tag = tag;
+        this.executable = executable;
+        this.actionDrivers[0] = actionDriver;
+
+    }
+
+    /**
+     * @deprecated old artefacts
+     * Creates an instruction to be interpreted by the InstructionRunner
+     * @param trigger the tags that this instruction executes after
+     * @param tag the tag that is returned when this instruction finishes executing
+     * @param executable the code to execute
+     * @param actionDrivers tells the instruction which ActionDriver to wait on
+     */
+    public Instruction(String trigger, String tag, InstructionExecutable executable, ActionDriver... actionDrivers){
+        this.triggers = new String[] {trigger};
+        this.tag = tag;
+        this.executable = executable;
+        this.actionDrivers = actionDrivers;
+    }
+
+
+    /**
+     * @deprecated old artefacts
      * Creates an instruction WITHOUT A RETURN TAG, there will be no informing when this instruction finishes executing
-     * @param triggers the tag that this instruction executes after
+     * @param trigger the tag that this instruction executes after
+     * @param triggers the extra tags to wait on
      * @param executable the code to execute
      */
-    public Instruction(InstructionExecutable executable, String... triggers){
-        this.triggers = triggers;
+    public Instruction(String trigger, InstructionExecutable executable, String... triggers){
+        this.triggers = add2BeginningOfArray(triggers, trigger);
         this.executable = executable;
-        hasReturn = false;
     }
 
     public ActionDriver[] getActionDrivers() {
@@ -50,7 +99,6 @@ public class Instruction {
         return triggers;
     }
 
-    public boolean getHasReturn(){return hasReturn;}
 
     public InstructionExecutable getExecutable(){return executable; }
 
@@ -59,9 +107,46 @@ public class Instruction {
         return "Instruction{" +
                 "triggers='" + triggers.toString() + '\'' +
                 ", tag='" + tag + '\'' +
-                ", hasReturn=" + hasReturn +
                 '}';
     }
+
+
+    /**
+     * Takes in the primed triggers and checks if this instruction needs to start or not
+     * @param inputTags the array of triggers to check requirements against
+     * @return
+     */
+    public boolean checkStart(String... inputTags) {
+        for (String trigger : triggers){
+            boolean isContained = false;
+            for (String inputTag : inputTags){
+                if (!trigger.equals(inputTag))
+                    isContained = true;
+            }
+            if(!isContained)
+                return false;
+        }
+        return true;
+    }
+
+    /** checks if the the actionDriver is completed or not based on their state
+     *
+     */
+    boolean checkCompletion(ActionDriver... completedActionDrivers){
+        if (Objects.isNull(actionDrivers) ||actionDrivers.length == 0)
+            return true;
+
+        return Arrays.asList(completedActionDrivers).containsAll(Arrays.asList(actionDrivers));
+    }
+
+    /**
+     * the primary execution function
+     * this will modify itself as necessary
+     */
+    abstract void execute();
+
+
+
 }
 
 

@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.driveobjs.drivers;
 
+import org.firstinspires.ftc.teamcode.driveobjs.instructables.ActionDriver;
+import org.firstinspires.ftc.teamcode.driveobjs.instructables.InstantInstruction;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.Instructable;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.Instruction;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.InstructionExecutable;
+import org.firstinspires.ftc.teamcode.driveobjs.instructables.SetInstruction;
 
 /**
  * a simple driver that returns !isBusy() after a certain amount of time
@@ -49,27 +52,35 @@ public class TimerDriver implements ActionDriver, Instructable {
      * @return
      */
     @Override
-    public Instruction makeInstruction(String triggerTag, String returnTag, InstructionExecutable executable) {
-        return new Instruction(triggerTag, returnTag, executable, this);
+    public Instruction makeInstruction(String triggerTag, String returnTag, InstructionExecutable executable, String... triggers) {
+        return new SetInstruction(triggerTag, returnTag, ()->{this.init();}, this, triggers);
     }
 
-    public static Instruction[] waitInstruction(String triggerTag, String returnTag, long time){
-        TimerDriver timer = new TimerDriver(time);
-        Instruction[] instructions = {
-                new Instruction(triggerTag, ()->{timer.init();}),
-                new Instruction(triggerTag, returnTag, ()->{}, timer)
-        };
-        return instructions;
-    }
+
 
     /**
-     * this is literally useless please do not use this
+     * @deprecated this is literally useless please do not use this
      * @param triggerTag the tag that this instruction executes after
      * @param executable the code to execute
      * @return
      */
     @Override
-    public Instruction makeInstruction(String triggerTag, InstructionExecutable executable) {
-        return new Instruction(triggerTag, executable);
+    public Instruction makeInstruction(String triggerTag, InstructionExecutable executable, String... triggers) {
+        return new InstantInstruction(triggerTag, executable, triggers);
+    }
+
+
+    /**
+     * public static method to make a new TimerDriver to wait
+     * @param triggerTag the tag to trigger on
+     * @param returnTag the tag to return
+     * @param time the time to wait in milliseconds
+     * @param triggers (Optional) extra tags to trigger on
+     * @return
+     */
+    public static Instruction waitInstruction(String triggerTag, String returnTag, long time, String... triggers){
+        TimerDriver timer = new TimerDriver(time);
+        Instruction instruction = new SetInstruction(triggerTag, returnTag, ()->{timer.init();}, timer, triggers);
+        return instruction;
     }
 }

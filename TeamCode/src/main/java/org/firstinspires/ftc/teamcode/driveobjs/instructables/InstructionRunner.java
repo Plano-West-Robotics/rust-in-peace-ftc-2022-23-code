@@ -4,9 +4,9 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.driveobjs.drivers.ActionDriver;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -45,8 +45,8 @@ public class InstructionRunner {
      * @param returnTag the tag that is returned when this instruction finishes executing
      * @param executable the code to execute
      */
-    public void addInstruction(String returnTag, InstructionExecutable executable, ActionDriver actionDriver, String... triggerTags) {
-        instructions.add(new Instruction(returnTag, executable, actionDriver, triggerTags);
+    public void addContinousInstruction(String trigger, String returnTag, InstructionExecutable executable, ActionDriver actionDriver, String... triggerTags) {
+        instructions.add(new ContinuousInstruction(trigger, returnTag, executable, actionDriver, triggerTags));
     }
 
     /**
@@ -67,20 +67,22 @@ public class InstructionRunner {
      * this is intended to be looped to follow the list of instructions
      */
     public String run() {
-        //creates a shallow copy of needsExecution to loop through
+        //creates a shallow copy of needsExecution to loop through for pruning
         ArrayList<Instruction> executionCopy = (ArrayList<Instruction>) needsExecution.clone();
 
+        //prunes the completed instructions
+        ActionDriver[] completedActionDrivers = checkActionDriverCompletion();
         for (Instruction i : executionCopy) {
-            pruneInstruction(i);
+            pruneInstruction(i, completedActionDrivers);
         }
 
 
-        //runs find instructions on every tag in tags
-        while (!tags.isEmpty()){
-            findInstructions(tags.poll());
-        }
+        //runs findInstructions on every tag in tags
+        //this gets all of the instructions needed and adds them to execution copy
+        needsExecution = findInstructions(tags, instructions);
 
-        telemetry.addData("Found Instructions", needsExecution.toString());
+
+        telemetry.addData("Found Instructions: ", needsExecution.toString());
 
 
 
@@ -98,28 +100,20 @@ public class InstructionRunner {
     }
 
     /**
-     * executes the instruction given
+     * executes the instruction given by calling their execute() method
      * @param i the instruction to be run against
      */
     private void executeInstruction(Instruction i) {
-        //runs the code
-        i.getExecutable().execute();
+        i.execute();
     }
 
     /**
      * removes the instruction if it is a one time execution, or if it is completed
      * @param i te instruction to be run against
      */
-    private void pruneInstruction(Instruction i){
-        //checks if the Instruction has a return tag
-        if (!i.getHasReturn()){
-            //if it does not, removes the instruction, and exits
-            needsExecution.remove(i);
-            return;
-        }
-
+    private void pruneInstruction(Instruction i, ActionDriver[] completedActionDrivers){
         //checks if the completion condition has been met
-        if (checkCompletion(i.getActionDrivers())){
+        if (i.checkCompletion(completedActionDrivers)){
             //if it is met, this will remove it from the list and add its tag to tags
             needsExecution.remove(i);
             tags.add(i.getTag());
@@ -128,29 +122,31 @@ public class InstructionRunner {
     }
 
     /**
-     * checks if all of the actionDrivers passed to it are no longer busy
-     * @param actionDrivers
-     * @return
+     * checks which actionDrivers are done and returns the list of completed ones (reduces isBusy() checks)
+     * @return an arraylist of completed actiondrivers
      */
-    private boolean checkCompletion(ActionDriver[] actionDrivers){
+    private ActionDriver[] checkActionDriverCompletion(){
+        ArrayList<ActionDriver> completedActionDrivers = new ArrayList<>();
         for(ActionDriver driver : actionDrivers){
-            if (driver.isBusy())
-                return false;
+            if (!driver.isBusy())
+                completedActionDrivers.add(driver);
         }
-        return true;
+        return completedActionDrivers.toArray(new ActionDriver[0]);
     }
 
 
     /**
-     * digs out the instructions that the new tag triggers
-     * @param tag the tag that is being checked for as a trigger
+     * digs out the instructions that the new tag(s) triggers
+     * @param tags the tag that is being checked for as a trigger
+     * @param instructions the list of instructions to check for readiness
      */
-    private void findInstructions(String tag) {
+    private ArrayList<Instruction> findInstructions(Queue tags, ArrayList<Instruction> instructions) {
+        ArrayList<Instruction> needsExecution = new ArrayList<>();
         for (Instruction instruction : instructions) {
-            if (instruction.getTrigger().equalsIgnoreCase(tag)) {
+            if (tags.containsAll(Arrays.asList(instruction.getTriggers())))
                 needsExecution.add(instruction);
-            }
         }
+        return needsExecution;
     }
 
     public String getTags(){

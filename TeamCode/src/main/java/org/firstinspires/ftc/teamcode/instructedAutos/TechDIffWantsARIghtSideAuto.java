@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.driveobjs.instructables.instructedAutos;
+package org.firstinspires.ftc.teamcode.instructedAutos;
 
 import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.MAX_ANG_VEL;
 import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.TRACK_WIDTH;

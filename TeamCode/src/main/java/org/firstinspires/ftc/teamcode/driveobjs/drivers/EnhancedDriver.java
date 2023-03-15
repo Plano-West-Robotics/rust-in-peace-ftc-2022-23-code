@@ -17,9 +17,13 @@ import org.firstinspires.ftc.teamcode.configs.ArmPosStorage;
 import org.firstinspires.ftc.teamcode.configs.PoseStorage;
 import org.firstinspires.ftc.teamcode.configs.StartingTiles;
 import org.firstinspires.ftc.teamcode.driveobjs.ActionObjectOld;
+import org.firstinspires.ftc.teamcode.driveobjs.instructables.ActionDriver;
+import org.firstinspires.ftc.teamcode.driveobjs.instructables.ContinuousInstruction;
+import org.firstinspires.ftc.teamcode.driveobjs.instructables.InstantInstruction;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.Instructable;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.Instruction;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.InstructionExecutable;
+import org.firstinspires.ftc.teamcode.driveobjs.instructables.SetInstruction;
 import org.firstinspires.ftc.teamcode.roadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
 
@@ -322,37 +326,31 @@ public class EnhancedDriver extends SampleMecanumDrive implements ActionDriver, 
      * @param triggerTag the tag that this instruction executes after
      * @param returnTag the tag that is returned when this instruction finishes executing
      * @param executable the code to execute
+     * @param triggers extra triggers to wait on
      * @return returns the intruction that has been created
      */
     @Override
-    public Instruction makeInstruction(String triggerTag, String returnTag, InstructionExecutable executable) {
-        return new Instruction(triggerTag, returnTag, executable, this);
-    }
-
-    /**
-     * @deprecated PLEASE DO NOT USE THIS FOR ACTUAL ASYNC PATH FOLLOWING
-     * quick instruction creator that waits on this driver and follows this trajectory
-     * @param triggerTag the tag that this instruction executes after
-     * @param returnTag the tag that is returned when this instruction finishes executing
-     * @param trajectory the trajectory to follow
-     * @return
-     */
-    public Instruction makeInstruction(String triggerTag, String returnTag, Trajectory trajectory){
-        return new Instruction(triggerTag, returnTag, ()-> this.followTrajectoryAsync(trajectory), this);
+    public Instruction makeInstruction(String triggerTag, String returnTag, InstructionExecutable executable, String... triggers) {
+        return new ContinuousInstruction(triggerTag, returnTag, executable, this, triggers);
     }
 
 
     /**
-     * @deprecated PLEASE DO NOT USE THIS FOR ACTUAL ASYNC PATH FOLLOWING
-     * Creates an instruction
+     * @deprecated please do not use this to set things
      * @param triggerTag the tag that this instruction executes after
      * @param executable the code to execute
+     * @param triggers extra triggers to wait on
      * @return
      */
     @Override
-    public Instruction makeInstruction(String triggerTag, InstructionExecutable executable){
-        return new Instruction(triggerTag, executable);
+    public Instruction makeInstruction(String triggerTag, InstructionExecutable executable, String... triggers){
+        return new InstantInstruction(triggerTag, executable, triggers);
     }
+
+
+
+
+
 
     /**
      * USE THIS FOR PATH FOLLOWING
@@ -362,12 +360,8 @@ public class EnhancedDriver extends SampleMecanumDrive implements ActionDriver, 
      * @param trajectory
      * @return
      */
-    public Instruction[] asyncPathFollowInstruction(String triggerTag, String returnTag, Trajectory trajectory){
-        Instruction[] instructions = {
-                new Instruction(triggerTag, () -> this.followTrajectoryAsync(trajectory)),
-                new Instruction(triggerTag, returnTag, ()->{}, this)
-        };
-        return instructions;
+    public Instruction asyncPathFollowInstruction(String triggerTag, String returnTag, Trajectory trajectory, String... triggers){
+        return new SetInstruction(triggerTag, returnTag, () -> this.followTrajectoryAsync(trajectory), this, triggers);
     }
     /**
      * USE THIS FOR PATH FOLLOWING
@@ -377,28 +371,19 @@ public class EnhancedDriver extends SampleMecanumDrive implements ActionDriver, 
      * @param trajectory
      * @return
      */
-    public Instruction[] asyncPathFollowInstruction(String triggerTag, String returnTag, TrajectorySequence trajectory){
-        Instruction[] instructions = {
-                new Instruction(triggerTag, () -> this.followTrajectorySequenceAsync(trajectory)),
-                new Instruction(triggerTag, returnTag, ()->{}, this)
-        };
-        return instructions;
+    public Instruction asyncPathFollowInstruction(String triggerTag, String returnTag, TrajectorySequence trajectory, String... triggers){
+        return new SetInstruction(triggerTag, returnTag, () -> this.followTrajectorySequenceAsync(trajectory), this, triggers);
     }
 
     /**
      * USE THIS
-     * This is an incredibly shitty solution to prevent it from spamming enhanced driver with instructions
      * @param triggerTag
      * @param returnTag
      * @param executable the lambda expression to execute
      * @return
      */
-    public Instruction[] makeAsyncInstruction(String triggerTag, String returnTag, InstructionExecutable executable){
-        Instruction[] instructions = {
-                new Instruction(triggerTag, executable),
-                new Instruction(triggerTag, returnTag, ()->{}, this)
-        };
-        return instructions;
+    public Instruction makeAsyncInstruction(String triggerTag, String returnTag, InstructionExecutable executable, String... triggers){
+        return new SetInstruction(triggerTag, returnTag, executable, this, triggers);
     }
 
 

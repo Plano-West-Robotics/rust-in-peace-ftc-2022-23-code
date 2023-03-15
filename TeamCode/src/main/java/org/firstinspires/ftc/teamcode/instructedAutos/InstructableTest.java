@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.driveobjs.instructables.instructedAutos;
+package org.firstinspires.ftc.teamcode.instructedAutos;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;

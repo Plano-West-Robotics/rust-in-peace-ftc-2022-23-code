@@ -7,6 +7,9 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.driveobjs.instructables.ActionDriver;
+import org.firstinspires.ftc.teamcode.driveobjs.instructables.ContinuousInstruction;
+import org.firstinspires.ftc.teamcode.driveobjs.instructables.InstantInstruction;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.Instructable;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.Instruction;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.InstructionExecutable;
@@ -91,8 +94,8 @@ public class ClawDriver implements ActionDriver, Instructable {
      * @return returns the intruction that has been created
      */
     @Override
-    public Instruction makeInstruction(String triggerTag, String returnTag, InstructionExecutable executable) {
-        return new Instruction(triggerTag, returnTag, executable, this);
+    public Instruction makeInstruction(String triggerTag, String returnTag, InstructionExecutable executable, String... triggers) {
+        return new ContinuousInstruction(triggerTag, returnTag, executable, this, triggers);
     }
 
     /**
@@ -101,7 +104,7 @@ public class ClawDriver implements ActionDriver, Instructable {
      * @return the instruction made
      */
     public Instruction closeInstruction(String triggerTag){
-        return new Instruction(triggerTag, () -> this.close());
+        return new InstantInstruction(triggerTag, () -> this.close());
     }
 
     /**
@@ -110,9 +113,22 @@ public class ClawDriver implements ActionDriver, Instructable {
      * @return the instruction made
      */
     public Instruction openInstruction(String triggerTag){
-        return new Instruction(triggerTag, () -> this.open());
+        return new InstantInstruction(triggerTag, () -> this.open());
     }
 
+    /**
+     * makes a quick instruction to open
+     * COMES WITH A {@WAIT_TICK} mill wait
+     * @param triggerTag the tag to trigger on
+     * @return the instruction made
+     */
+    public Instruction[] openInstruction(String triggerTag, String returnTag, String... triggers){
+        final int WAIT_TICK = 300;
+        return new Instruction[]{
+                new InstantInstruction(triggerTag, () -> this.open()),
+                TimerDriver.waitInstruction(triggerTag, returnTag, WAIT_TICK, triggers)
+        };
+    }
 
     /**
      * Creates an instruction
@@ -122,10 +138,9 @@ public class ClawDriver implements ActionDriver, Instructable {
      * @return
      */
     @Override
-    public Instruction makeInstruction(String triggerTag, InstructionExecutable executable){
-        return new Instruction(triggerTag, executable);
+    public Instruction makeInstruction(String triggerTag, InstructionExecutable executable, String... triggers){
+        return new InstantInstruction(triggerTag, executable, triggers);
     }
-
 
 }
 

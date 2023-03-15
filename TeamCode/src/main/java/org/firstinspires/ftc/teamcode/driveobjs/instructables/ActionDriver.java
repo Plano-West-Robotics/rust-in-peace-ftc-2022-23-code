@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.driveobjs.drivers;
+package org.firstinspires.ftc.teamcode.driveobjs.instructables;
 
 public interface ActionDriver {
     void init();
@@ -9,7 +9,6 @@ public interface ActionDriver {
     void run();
 
     /**
-     *
      * @return whether or not this driver is busy
      */
     boolean isBusy();

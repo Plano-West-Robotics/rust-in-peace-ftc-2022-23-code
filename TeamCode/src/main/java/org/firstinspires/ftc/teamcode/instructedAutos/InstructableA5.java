@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.driveobjs.instructables.instructedAutos;
+package org.firstinspires.ftc.teamcode.instructedAutos;
 
 import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.MAX_ANG_VEL;
 import static org.firstinspires.ftc.teamcode.roadRunner.drive.DriveConstants.TRACK_WIDTH;
@@ -12,7 +12,6 @@ import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAcceleration
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.configs.ArmPosStorage;
 import org.firstinspires.ftc.teamcode.configs.ParkingCalculator;
 import org.firstinspires.ftc.teamcode.configs.StartingTiles;
 import org.firstinspires.ftc.teamcode.driveobjs.aprilTag.AprilTagDetector;
@@ -22,13 +21,12 @@ import org.firstinspires.ftc.teamcode.driveobjs.drivers.LinearSlideDriver;
 import org.firstinspires.ftc.teamcode.driveobjs.drivers.TimerDriver;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.Instruction;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.InstructionRunner;
-import org.firstinspires.ftc.teamcode.roadRunner.trajectorysequence.TrajectorySequence;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 @Autonomous
-public class InstructableA5Dev extends InstructableBase{
+public class InstructableA5 extends InstructableBase{
     InstructionRunner runner;
     ClawDriver claw;
     EnhancedDriver driver;
@@ -53,77 +51,28 @@ public class InstructableA5Dev extends InstructableBase{
                 .lineToConstantHeading(new Vector2d(18, 61), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
                 .splineToConstantHeading(new Vector2d(12, 50), Math.toRadians(-90), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
                 .lineToSplineHeading(new Pose2d(12, 30, Math.toRadians(-180)), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
-                .splineToConstantHeading(new Vector2d(9, 24.5), Math.toRadians(-180), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
+                .splineToConstantHeading(new Vector2d(9, 23), Math.toRadians(-180), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
                 .build();
 
 
         runner.addInstruction(driver.asyncPathFollowInstruction("START", "TRAJ1", traj1));
 
+
+
         runner.addInstruction(claw.closeInstruction("START"));
+        runner.addInstruction(TimerDriver.waitInstruction("START", "STARTSLIDE1", 2500));
 
-        runner.addInstruction(slide.makeInstruction("START", "SLIDE1", () -> {slide.setTargetHigh();}));
-        runner.addInstruction(TimerDriver.waitInstruction("SLIDE1", "SLIDE1_2", 300));
-        runner.addInstruction(slide.makeInstruction("SLIDE1_2", "SLIDE1_3", ()->{slide.setTargetHigh();}));
+        runner.addInstruction(slide.makeInstruction("STARTSLIDE1", "SLIDE1", () -> {slide.setTargetHigh();}));
 
-        runner.addInstruction(TimerDriver.waitInstruction("SLIDE1_3", "FALLWAIT", 2000));
+        runner.addInstruction(TimerDriver.waitInstruction("SLIDE1", "FALLWAIT", 2000));
         runner.addInstruction(claw.openInstruction("FALLWAIT"));
         runner.addInstruction(TimerDriver.waitInstruction("FALLWAIT", "FINISHOPEN", 1000));
 
-        /**
-         * goes to grab a new cone
-         */
         Trajectory traj2 = driver.trajectoryBuilder(traj1.end())
-                .splineToConstantHeading(new Vector2d(12, 21), Math.toRadians(-90), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
-                .lineToConstantHeading(new Vector2d(12, 12), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
-                /*
-                        .splineToConstantHeading(new Vector2d(-24, 12), Math.toRadians(-180), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
-                        .lineToSplineHeading(new Pose2d(-44, 12, Math.toRadians(-180)), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
-                        .lineToConstantHeading(new Vector2d(-63, 12), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
-                */
+                .splineToConstantHeading(new Vector2d(12, 24), Math.toRadians(-90))
+                .lineToConstantHeading(new Vector2d(12, 9))
                 .build();
-        runner.addInstruction(driver.asyncPathFollowInstruction("FINISHOPEN", "TRAJ2", traj2));
-        runner.addInstruction(driver.makeAsyncInstruction("TRAJ2", "TURN_1", ()->{
-            driver.turnAsync(Math.toRadians(-90));
-        }));
-
-        Trajectory traj2_5 = driver.trajectoryBuilder(traj2.end())
-                .lineToConstantHeading(new Vector2d (62, 12))
-                .build();
-
-        runner.addInstruction(driver.asyncPathFollowInstruction("TURN_1", "TRAJ2_5", traj2_5));
-
-        runner.addInstruction(TimerDriver.waitInstruction("TURN_1", "SLIDELOWER",500));
-        runner.addInstruction(slide.makeInstruction("SLIDELOWER", "SLIDELOWERED", ()->{
-            slide.setTargetPosition(ArmPosStorage.stackArmPoses[0]);
-        }));
-
-        runner.addInstruction(claw.closeInstruction("TRAJ2_5"));
-        runner.addInstruction(TimerDriver.waitInstruction("TRAJ2_5", "GRABSTACK1", 300));
-
-        runner.addInstruction(slide.makeInstruction("GRABSTACK1", "SLIDEMOVED", ()->slide.setTargetPosition(slide.getCurrentEncoderValue()+200)));
-
-
-
-        /**
-         * after picking up a new cone
-         */
-        TrajectorySequence traj3 = driver.trajectorySequenceBuilder(traj2_5.end())
-                .lineToConstantHeading(new Vector2d(30, 12))
-                .turn(90)
-                .splineToConstantHeading(new Vector2d(26, 12), Math.toRadians(-90))
-                .build();
-
-        runner.addInstruction(driver.asyncPathFollowInstruction("SLIDEMOVED", "TRAJ3", traj3));
-        runner.addInstruction(TimerDriver.waitInstruction("SLIDEMOVED", "SLIDE_HIGH_2", 200));
-        runner.addInstruction(slide.makeInstruction("SLIDEMOVED", "SLIDEMOVED_2", ()->{slide.setTargetHigh();}));
-        runner.addInstruction(TimerDriver.waitInstruction("SLIDEMOVED2", "FALLWAIT2", 2000));
-        runner.addInstruction(claw.openInstruction("FALLWAIT2"));
-        runner.addInstruction(TimerDriver.waitInstruction("FALLWAIT2", "CLAWFINISH2", 300));
-
-        Trajectory trajFinal = driver.trajectoryBuilder(traj3.end())
-                .lineToConstantHeading(new Vector2d(20, 12))
-                .build();
-        runner.addInstruction(driver.asyncPathFollowInstruction("CLAWFINISH2", "START_PARKING_SEQUENCE", trajFinal));
+        runner.addInstruction(driver.asyncPathFollowInstruction("FINISHOPEN", "START_PARKING_SEQUENCE", traj2));
 
 
 

@@ -9,12 +9,14 @@ import static org.firstinspires.ftc.teamcode.configs.HardwareNames.spoolMotorNam
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.driveobjs.instructables.ActionDriver;
+import org.firstinspires.ftc.teamcode.driveobjs.instructables.InstantInstruction;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.Instructable;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.Instruction;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.InstructionExecutable;
+import org.firstinspires.ftc.teamcode.driveobjs.instructables.SetInstruction;
 
 @Config
 public class LinearSlideDriver implements ActionDriver, Instructable {
@@ -62,7 +64,7 @@ public class LinearSlideDriver implements ActionDriver, Instructable {
     public void init() {
         spoolMotor = hardwareMap.get(DcMotorEx.class, spoolMotorName);
         spoolMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        //spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spoolMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spoolMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         long lastTime = System.currentTimeMillis();
@@ -128,9 +130,9 @@ public class LinearSlideDriver implements ActionDriver, Instructable {
             }
 
             if (isPositive && spoolMotor.getTargetPosition() > spoolMotor.getCurrentPosition()) {
-                spoolMotor.setPower(-1);
-            } else if (spoolMotor.getTargetPosition() < spoolMotor.getCurrentPosition()) {
                 spoolMotor.setPower(1);
+            } else if (spoolMotor.getTargetPosition() < spoolMotor.getCurrentPosition()) {
+                spoolMotor.setPower(-1);
             }
 
 
@@ -160,15 +162,16 @@ public class LinearSlideDriver implements ActionDriver, Instructable {
 
 
     /**
-     * Creates an instruction that waits on this driver by default
+     * Creates a setinstruction that waits on this driver by default
      * @param triggerTag the tag that this instruction executes after
      * @param returnTag the tag that is returned when this instruction finishes executing
      * @param executable the code to execute
+     * @param triggers extra triggers to wait on
      * @return returns the intruction that has been created
      */
     @Override
-    public Instruction makeInstruction(String triggerTag, String returnTag, InstructionExecutable executable) {
-        return new Instruction(triggerTag, returnTag, executable, this);
+    public Instruction makeInstruction(String triggerTag, String returnTag, InstructionExecutable executable, String... triggers) {
+        return new SetInstruction(triggerTag, returnTag, executable, this, triggers);
     }
 
 
@@ -176,11 +179,12 @@ public class LinearSlideDriver implements ActionDriver, Instructable {
      * Creates an instruction
      * @param triggerTag the tag that this instruction executes after
      * @param executable the code to execute
+     * @param triggers extra triggers to wait on
      * @return
      */
     @Override
-    public Instruction makeInstruction(String triggerTag, InstructionExecutable executable){
-        return new Instruction(triggerTag, executable);
+    public Instruction makeInstruction(String triggerTag, InstructionExecutable executable, String... triggers){
+        return new InstantInstruction(triggerTag, executable, triggers);
     }
 
 }

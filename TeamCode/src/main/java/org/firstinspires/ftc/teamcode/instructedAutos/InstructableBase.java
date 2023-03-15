@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.driveobjs.instructables.instructedAutos;
+package org.firstinspires.ftc.teamcode.instructedAutos;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
