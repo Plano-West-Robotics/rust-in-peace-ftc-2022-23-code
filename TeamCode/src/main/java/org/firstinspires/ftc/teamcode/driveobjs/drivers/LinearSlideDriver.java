@@ -9,6 +9,7 @@ import static org.firstinspires.ftc.teamcode.configs.HardwareNames.spoolMotorNam
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.ActionDriver;
@@ -64,7 +65,7 @@ public class LinearSlideDriver implements ActionDriver, Instructable {
     public void init() {
         spoolMotor = hardwareMap.get(DcMotorEx.class, spoolMotorName);
         spoolMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         spoolMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spoolMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         long lastTime = System.currentTimeMillis();

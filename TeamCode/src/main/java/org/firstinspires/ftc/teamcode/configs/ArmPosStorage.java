@@ -18,7 +18,7 @@ public class ArmPosStorage {
     public static int ARM_POS_2 = 3000;
 
     //high TODO: check accuracy
-    public static int ARM_POS_3 = 3000;
+    public static int ARM_POS_3 = 4000;
 
     /**
      * stores the positions required to traverse the stack

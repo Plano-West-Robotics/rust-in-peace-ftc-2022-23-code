@@ -15,7 +15,7 @@ public class SetInstruction extends Instruction{
         this.triggers = add2BeginningOfArray(triggers, trigger);
         this.tag = tag;
         this.executable = executable;
-        this.actionDrivers[0] = actionDriver;
+        this.actionDrivers = new ActionDriver[]{actionDriver};
         hasExecuted = false;
 
     }
