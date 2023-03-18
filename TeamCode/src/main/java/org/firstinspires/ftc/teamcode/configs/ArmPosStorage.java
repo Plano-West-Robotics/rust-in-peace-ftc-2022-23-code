@@ -12,17 +12,17 @@ public class ArmPosStorage {
     public static int ARM_POS_0 = 0;
 
     //low TODO: check accuracy
-    public static int ARM_POS_1 = 200;
+    public static int ARM_POS_1 = -200;
 
     //medium TODO: check accuracy
-    public static int ARM_POS_2 = 3000;
+    public static int ARM_POS_2 = -3000;
 
     //high TODO: check accuracy
-    public static int ARM_POS_3 = 4000;
+    public static int ARM_POS_3 = -4000;
 
     /**
      * stores the positions required to traverse the stack
      * TODO: RE-TUNE
      */
-    public static int[] stackArmPoses = {-250, 292, 142, 42, 0};
+    public static int[] stackArmPoses = {-564, -292, -142, -42, 0};
 }

@@ -39,7 +39,7 @@ public class InstructableA5Dev extends InstructableBase{
     public void runOpMode() throws InterruptedException {
         claw = new ClawDriver(hardwareMap);
         driver = new EnhancedDriver(hardwareMap);
-        slide = new LinearSlideDriver(hardwareMap);
+        slide = new LinearSlideDriver(hardwareMap, telemetry);
         runner = new InstructionRunner(hardwareMap, startPose, "START", telemetry, claw, driver, slide);
 
         driver.setPoseEstimate(startPose);
@@ -52,23 +52,21 @@ public class InstructableA5Dev extends InstructableBase{
                 .splineToConstantHeading(new Vector2d(30, 61), Math.toRadians(-180))
                 .lineToConstantHeading(new Vector2d(18, 61), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
                 .splineToConstantHeading(new Vector2d(12, 50), Math.toRadians(-90), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
+                .lineToConstantHeading(new Vector2d(12, 45))
                 .lineToSplineHeading(new Pose2d(12, 30, Math.toRadians(-180)), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
                 .splineToConstantHeading(new Vector2d(9, 24.5), Math.toRadians(-180), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
                 .build();
 
 
-        runner.addInstruction(driver.asyncPathFollowInstruction("START", "TRAJ1", traj1));
+        runner.addInstruction(driver.asyncPathFollowInstruction("START", "TRAJ_1", traj1));
 
         runner.addInstruction(claw.closeInstruction("START"));
 
-        runner.addInstruction(slide.makeInstruction("START", "SLIDE1", () -> {slide.setTargetHigh();}));
-        runner.addInstruction(TimerDriver.waitInstruction("SLIDE1", "SLIDE1_2", 300));
-        runner.addInstruction(slide.makeInstruction("SLIDE1_2", "SLIDE1_3", ()->{slide.setTargetHigh();}));
+        //runner.addInstruction(TimerDriver.waitInstruction("START", "START_SLIDE", 300));
+        runner.addInstruction(slide.makeInstruction("START", "SLIDE_1", ()->{slide.setTargetHigh();}));
 
-        runner.addInstruction(TimerDriver.waitInstruction("SLIDE1_3", "FALLWAIT", 2000));
-        runner.addInstruction(claw.openInstruction("FALLWAIT"));
-        runner.addInstruction(TimerDriver.waitInstruction("FALLWAIT", "FINISHOPEN", 1000));
-
+        runner.addInstruction(TimerDriver.waitInstruction("SLIDE_1", "FALL_WAIT", 2000, "TRAJ_1"));
+        runner.addInstruction(claw.openInstruction("FALL_WAIT", "FINISH_OPEN"));
         /**
          * goes to grab a new cone
          */
@@ -81,8 +79,8 @@ public class InstructableA5Dev extends InstructableBase{
                         .lineToConstantHeading(new Vector2d(-63, 12), VEL_CONSTRAINT, ACCEL_CONSTRAINT)
                 */
                 .build();
-        runner.addInstruction(driver.asyncPathFollowInstruction("FINISHOPEN", "TRAJ2", traj2));
-        runner.addInstruction(driver.makeAsyncInstruction("TRAJ2", "TURN_1", ()->{
+        runner.addInstruction(driver.asyncPathFollowInstruction("FINISH_OPEN", "TRAJ_2", traj2));
+        runner.addInstruction(driver.makeAsyncInstruction("TRAJ_2", "TURN_1", ()->{
             driver.turnAsync(Math.toRadians(-90));
         }));
 
@@ -117,13 +115,12 @@ public class InstructableA5Dev extends InstructableBase{
         runner.addInstruction(TimerDriver.waitInstruction("SLIDEMOVED", "SLIDE_HIGH_2", 200));
         runner.addInstruction(slide.makeInstruction("SLIDEMOVED", "SLIDEMOVED_2", ()->{slide.setTargetHigh();}));
         runner.addInstruction(TimerDriver.waitInstruction("SLIDEMOVED2", "FALLWAIT2", 2000));
-        runner.addInstruction(claw.openInstruction("FALLWAIT2"));
-        runner.addInstruction(TimerDriver.waitInstruction("FALLWAIT2", "CLAWFINISH2", 300));
+        runner.addInstruction(claw.openInstruction("FALL_WAIT_2", "CLAW_FINISH_2"));
 
         Trajectory trajFinal = driver.trajectoryBuilder(traj3.end())
                 .lineToConstantHeading(new Vector2d(20, 12))
                 .build();
-        runner.addInstruction(driver.asyncPathFollowInstruction("CLAWFINISH2", "START_PARKING_SEQUENCE", trajFinal));
+        runner.addInstruction(driver.asyncPathFollowInstruction("CLAW_FINISH_2", "START_PARKING_SEQUENCE", trajFinal));
 
 
 

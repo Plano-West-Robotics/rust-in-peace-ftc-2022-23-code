@@ -24,7 +24,7 @@ public class InstructableTest extends InstructableBase {
     public void runOpMode() throws InterruptedException {
         claw = new ClawDriver(hardwareMap);
         driver = new EnhancedDriver(hardwareMap);
-        slide = new LinearSlideDriver(hardwareMap);
+        slide = new LinearSlideDriver(hardwareMap, telemetry);
         runner = new InstructionRunner(hardwareMap, startPose, "START", telemetry, claw, driver, slide);
 
         runner.addInstruction(claw.makeInstruction("START", () -> {

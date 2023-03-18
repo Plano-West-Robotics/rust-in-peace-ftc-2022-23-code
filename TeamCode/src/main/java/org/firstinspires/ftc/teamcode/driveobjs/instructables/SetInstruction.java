@@ -45,6 +45,4 @@ public class SetInstruction extends Instruction{
             hasExecuted = true;
         }
     }
-
-
 }

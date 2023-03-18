@@ -7,13 +7,12 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.Objects;
 
 public class InstructionRunner {
     private Pose2d startPose;
     ActionDriver[] actionDrivers;
-    Queue<String> tags = new LinkedList<String>();
+    ArrayList<String> tags = new ArrayList<String>();
     Telemetry telemetry;
 
     //stores the instructions
@@ -59,6 +58,21 @@ public class InstructionRunner {
             this.instructions.add(i);
     }
 
+    /**
+     * adds the instruction to the list
+     * preferred over the other variant
+     * @param instructions the instruction to be added
+     */
+    public void add(Instruction... instructions){
+        for(Instruction i : instructions)
+            this.instructions.add(i);
+    }
+
+    public boolean hasNext(){
+        if (instructions.size() == 0)
+            return false;
+        return true;
+    }
 
 
 
@@ -79,10 +93,14 @@ public class InstructionRunner {
 
         //runs findInstructions on every tag in tags
         //this gets all of the instructions needed and adds them to execution copy
-        needsExecution = findInstructions(tags, instructions);
+        ArrayList<Instruction> newInstructions = findInstructions(tags, instructions);
+        for (Instruction i : newInstructions){
+            needsExecution.add(i);
+        }
 
 
-        telemetry.addData("Found Instructions: ", needsExecution.toString());
+        telemetry.addLine("Found Instructions: " + needsExecution.toString());
+        telemetry.addLine("Found Tags: " +  tags.toString());
 
 
 
@@ -113,12 +131,25 @@ public class InstructionRunner {
      */
     private void pruneInstruction(Instruction i, ActionDriver[] completedActionDrivers){
         //checks if the completion condition has been met
-        if (i.checkCompletion(completedActionDrivers)){
+        if (checkCompletion(i.getActionDrivers())){
             //if it is met, this will remove it from the list and add its tag to tags
             needsExecution.remove(i);
-            tags.add(i.getTag());
-            return;
+            if (!Objects.isNull(i.getTag()))
+                tags.add(i.getTag());
         }
+    }
+
+    /**
+     * checks if all of the actionDrivers passed to it are no longer busy
+     * @param actionDrivers
+     * @return
+     */
+    private boolean checkCompletion(ActionDriver[] actionDrivers){
+        for(ActionDriver driver : actionDrivers){
+            if (driver.isBusy())
+                return false;
+        }
+        return true;
     }
 
     /**
@@ -140,11 +171,15 @@ public class InstructionRunner {
      * @param tags the tag that is being checked for as a trigger
      * @param instructions the list of instructions to check for readiness
      */
-    private ArrayList<Instruction> findInstructions(Queue tags, ArrayList<Instruction> instructions) {
+    private ArrayList<Instruction> findInstructions(ArrayList<String> tags, ArrayList<Instruction> instructions) {
         ArrayList<Instruction> needsExecution = new ArrayList<>();
-        for (Instruction instruction : instructions) {
-            if (tags.containsAll(Arrays.asList(instruction.getTriggers())))
+        ArrayList<Instruction> instructionsCopy = (ArrayList<Instruction>) instructions.clone();
+
+        for (Instruction instruction : instructionsCopy) {
+            if (tags.containsAll(Arrays.asList(instruction.getTriggers()))){
                 needsExecution.add(instruction);
+                instructions.remove(instruction);
+            }
         }
         return needsExecution;
     }

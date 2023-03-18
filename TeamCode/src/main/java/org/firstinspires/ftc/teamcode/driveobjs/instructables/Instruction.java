@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.driveobjs.instructables;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 public abstract class Instruction {
 
@@ -133,10 +132,11 @@ public abstract class Instruction {
      *
      */
     boolean checkCompletion(ActionDriver... completedActionDrivers){
-        if (Objects.isNull(actionDrivers) ||actionDrivers.length == 0)
-            return true;
-
-        return Arrays.asList(completedActionDrivers).containsAll(Arrays.asList(actionDrivers));
+        for (ActionDriver driver : actionDrivers){
+            if (driver.isBusy())
+                return false;
+        }
+        return true;
     }
 
     /**

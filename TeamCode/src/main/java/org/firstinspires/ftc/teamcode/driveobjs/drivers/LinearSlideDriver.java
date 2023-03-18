@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.ActionDriver;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.InstantInstruction;
 import org.firstinspires.ftc.teamcode.driveobjs.instructables.Instructable;
@@ -37,9 +38,12 @@ public class LinearSlideDriver implements ActionDriver, Instructable {
     private boolean hasChanged = false;
     private boolean isPositive = false;
 
+    Telemetry telemetry;
 
-    public LinearSlideDriver(HardwareMap hardwareMap){
+
+    public LinearSlideDriver(HardwareMap hardwareMap, Telemetry telemetry){
         this.hardwareMap = hardwareMap;
+        this.telemetry = telemetry;
         init();
     }
 
@@ -65,7 +69,7 @@ public class LinearSlideDriver implements ActionDriver, Instructable {
     public void init() {
         spoolMotor = hardwareMap.get(DcMotorEx.class, spoolMotorName);
         spoolMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        spoolMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        spoolMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         spoolMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spoolMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         long lastTime = System.currentTimeMillis();
@@ -123,6 +127,8 @@ public class LinearSlideDriver implements ActionDriver, Instructable {
 
 
     public void run(){
+        telemetry.addLine("Encoder Value:" + spoolMotor.getCurrentPosition());
+
         if (hasChanged) {
             if (spoolMotor.getTargetPosition() == spoolMotor.getCurrentPosition()) {
                 spoolMotor.setPower(0);
@@ -132,8 +138,10 @@ public class LinearSlideDriver implements ActionDriver, Instructable {
 
             if (isPositive && spoolMotor.getTargetPosition() > spoolMotor.getCurrentPosition()) {
                 spoolMotor.setPower(1);
-            } else if (spoolMotor.getTargetPosition() < spoolMotor.getCurrentPosition()) {
+                telemetry.addLine("SLIDE IS RUNNING");
+            } else if (!isPositive && spoolMotor.getTargetPosition() < spoolMotor.getCurrentPosition()) {
                 spoolMotor.setPower(-1);
+                telemetry.addLine("SLIDE IS RUNNING");
             }
 
 
@@ -163,12 +171,12 @@ public class LinearSlideDriver implements ActionDriver, Instructable {
 
 
     /**
-     * Creates a setinstruction that waits on this driver by default
+     * Creates a SetInstruction that waits on this driver by default
      * @param triggerTag the tag that this instruction executes after
      * @param returnTag the tag that is returned when this instruction finishes executing
      * @param executable the code to execute
      * @param triggers extra triggers to wait on
-     * @return returns the intruction that has been created
+     * @return returns the Instruction that has been created
      */
     @Override
     public Instruction makeInstruction(String triggerTag, String returnTag, InstructionExecutable executable, String... triggers) {

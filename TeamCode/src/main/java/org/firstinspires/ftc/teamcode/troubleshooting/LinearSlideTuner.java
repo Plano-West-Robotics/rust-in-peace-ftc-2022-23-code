@@ -21,7 +21,7 @@ public class LinearSlideTuner extends LinearOpMode {
     private Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
     public void runOpMode(){
-        linearSlideDriver = new LinearSlideDriver(hardwareMap);
+        linearSlideDriver = new LinearSlideDriver(hardwareMap, telemetry);
         boolean manualMode = true;
         long startTime = System.currentTimeMillis();
 
@@ -69,7 +69,7 @@ public class LinearSlideTuner extends LinearOpMode {
 
 
                 if (gamepad1.start) {
-                    linearSlideDriver = new LinearSlideDriver(hardwareMap);
+                    linearSlideDriver = new LinearSlideDriver(hardwareMap, telemetry);
                 }
             }
 

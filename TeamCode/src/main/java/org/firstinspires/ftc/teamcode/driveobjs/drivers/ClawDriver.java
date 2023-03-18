@@ -106,6 +106,20 @@ public class ClawDriver implements ActionDriver, Instructable {
     public Instruction closeInstruction(String triggerTag){
         return new InstantInstruction(triggerTag, () -> this.close());
     }
+    /**
+     * makes a quick instruction to open
+     * COMES WITH A {@WAIT_TICK} mill wait
+     * @param triggerTag the tag to trigger on
+     * @return the instruction made
+     */
+    public Instruction[] closeInstruction(String triggerTag, String returnTag, String... triggers){
+        final int WAIT_TICK = 300;
+        return new Instruction[]{
+                new InstantInstruction(triggerTag, () -> this.close()),
+                TimerDriver.waitInstruction(triggerTag, returnTag, WAIT_TICK, triggers)
+        };
+    }
+
 
     /**
      * makes a quick no wait instruction to open
