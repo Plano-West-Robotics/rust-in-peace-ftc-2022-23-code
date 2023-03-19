@@ -15,12 +15,42 @@ public class MeepMeepA5 {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15.37)
                 .followTrajectorySequence(drive ->
                     drive.trajectorySequenceBuilder(new Pose2d(38, 63, Math.toRadians(-90)))
-                            .splineToConstantHeading(new Vector2d(40, 60), Math.toRadians(-180))
-                            .lineToConstantHeading(new Vector2d(16, 60))
-                            .splineToConstantHeading(new Vector2d(12, 55), Math.toRadians(-90))
-                            .lineToLinearHeading(new Pose2d(12, 27, Math.toRadians(-180)))
-                            .splineToConstantHeading(new Vector2d(8.5, 25.5), Math.toRadians(-180))
-                            .splineToConstantHeading(new Vector2d(12, 24), Math.toRadians(-90))
+                            .splineToConstantHeading(new Vector2d(30, 61), Math.toRadians(-180))
+                            .lineToConstantHeading(new Vector2d(18, 61))
+
+                            .splineToConstantHeading(new Vector2d(12, 50), Math.toRadians(-90))
+                            .lineToConstantHeading(new Vector2d(12, 20))
+                            .splineToConstantHeading(new Vector2d(18, 14), Math.toRadians(0))
+                            .splineToConstantHeading(new Vector2d(22.5, 10), Math.toRadians(-90))
+
+
+
+                            .splineToConstantHeading(new Vector2d(24, 12), 0)
+                            .lineToConstantHeading(new Vector2d(36, 12))
+                            .turn(Math.toRadians(90))
+                            .lineToConstantHeading(new Vector2d(62, 12))
+
+
+                            .lineToConstantHeading(new Vector2d(36, 12))
+                            .turn(Math.toRadians(-90))
+                            .lineToConstantHeading(new Vector2d(30, 12))
+                            //drop location
+                            .splineToConstantHeading(new Vector2d(25, 12-4.5), Math.toRadians(-90))
+
+                            .splineToConstantHeading(new Vector2d(30, 12), 0)
+                            .turn(Math.toRadians(90))
+                            .lineToConstantHeading(new Vector2d(62, 12))
+
+
+
+                            .lineToConstantHeading(new Vector2d(36, 12))
+                            .turn(Math.toRadians(-90))
+                            .lineToConstantHeading(new Vector2d(30, 12))
+                            .splineToConstantHeading(new Vector2d(25, 12-4.5), Math.toRadians(-90))
+
+                            .lineToConstantHeading(new Vector2d(26, 12))
+
+
                             .build()
                 );
 

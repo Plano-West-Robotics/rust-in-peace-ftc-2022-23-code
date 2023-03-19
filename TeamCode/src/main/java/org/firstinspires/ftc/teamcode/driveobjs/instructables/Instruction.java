@@ -104,7 +104,7 @@ public abstract class Instruction {
     @Override
     public String toString() {
         return "Instruction{" +
-                "triggers='" + triggers.toString() + '\'' +
+                "triggers='" + Arrays.asList(triggers) + '\'' +
                 ", tag='" + tag + '\'' +
                 '}';
     }

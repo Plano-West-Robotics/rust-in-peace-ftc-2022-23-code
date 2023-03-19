@@ -19,6 +19,46 @@ import java.util.List;
 public class ParkingCalculator {
     public static String parkingTrigger = "BEGIN_PARKING_SEQUENCE";
 
+    public static ArrayList<Instruction> lazyCalculateParking(String triggerTag, StartTile startTile, Pose2d lastPose, int parkPosition, EnhancedDriver enhancedDriver, double final_y){
+        ArrayList<Instruction> newInstructions = new ArrayList<>(0);
+        double parkX = 0;
+
+
+        switch (parkPosition){
+            case 1:
+                parkX = 60;
+                break;
+            case 2:
+                parkX = 36;
+                break;
+            case 3:
+                parkX = 12;
+                break;
+        }
+        double shifter = 0;
+        switch (startTile){
+            case A2:
+            case F5:
+                shifter = 0;
+            case A5:
+            case F2:
+                shifter = -72;
+        }
+        parkX+=shifter;
+
+        Pose2d finalPose = calculateTargetPositions(startTile, parkPosition);
+
+        newInstructions.add(enhancedDriver.asyncPathFollowInstruction(parkingTrigger, "FINISH_PARKING",
+                enhancedDriver.trajectorySequenceBuilder(lastPose)
+                        .lineToConstantHeading(new Vector2d(finalPose.getX(), final_y))
+                        .build()));
+
+
+        return newInstructions;
+    }
+
+
+
     public static ArrayList<Instruction> calculateParking(String triggerTag, StartTile startTile, Pose2d lastPose, int parkPosition, EnhancedDriver enhancedDriver){
         /**
          * does a quick check to see that there is actually a thing to process here

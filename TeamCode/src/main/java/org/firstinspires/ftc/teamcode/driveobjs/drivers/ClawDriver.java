@@ -113,7 +113,7 @@ public class ClawDriver implements ActionDriver, Instructable {
      * @return the instruction made
      */
     public Instruction[] closeInstruction(String triggerTag, String returnTag, String... triggers){
-        final int WAIT_TICK = 300;
+        final int WAIT_TICK = 50;
         return new Instruction[]{
                 new InstantInstruction(triggerTag, () -> this.close()),
                 TimerDriver.waitInstruction(triggerTag, returnTag, WAIT_TICK, triggers)
@@ -137,7 +137,7 @@ public class ClawDriver implements ActionDriver, Instructable {
      * @return the instruction made
      */
     public Instruction[] openInstruction(String triggerTag, String returnTag, String... triggers){
-        final int WAIT_TICK = 300;
+        final int WAIT_TICK = 50;
         return new Instruction[]{
                 new InstantInstruction(triggerTag, () -> this.open()),
                 TimerDriver.waitInstruction(triggerTag, returnTag, WAIT_TICK, triggers)

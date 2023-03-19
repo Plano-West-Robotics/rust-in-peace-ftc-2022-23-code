@@ -25,6 +25,8 @@ public class LinearSlideDriver implements ActionDriver, Instructable {
     private DcMotorEx spoolMotor;
     private HardwareMap hardwareMap;
 
+    private boolean isBusy;
+
     //TODO: tune these values
     public static double Kp = 0.1;
     public static double Ki = 0.1;
@@ -123,6 +125,7 @@ public class LinearSlideDriver implements ActionDriver, Instructable {
             isPositive = false;
         }
         hasChanged = true;
+        isBusy = true;
     }
 
 
@@ -138,9 +141,11 @@ public class LinearSlideDriver implements ActionDriver, Instructable {
 
             if (isPositive && spoolMotor.getTargetPosition() > spoolMotor.getCurrentPosition()) {
                 spoolMotor.setPower(1);
+                isBusy = true;
                 telemetry.addLine("SLIDE IS RUNNING");
             } else if (!isPositive && spoolMotor.getTargetPosition() < spoolMotor.getCurrentPosition()) {
                 spoolMotor.setPower(-1);
+                isBusy = true;
                 telemetry.addLine("SLIDE IS RUNNING");
             }
 
@@ -166,7 +171,7 @@ public class LinearSlideDriver implements ActionDriver, Instructable {
 
     @Override
     public boolean isBusy(){
-        return spoolMotor.isBusy();
+        return hasChanged;
     }
 
 
